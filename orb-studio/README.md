@@ -1,73 +1,100 @@
-# React + TypeScript + Vite
+# Orb Studio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Kurzbeschreibung
+Orb Studio ist eine interaktive Webanwendung zur Visualisierung und Konfiguration eines 3D-Orbs. Die Anwendung richtet sich an Entwickler und Designer, die Shader-Effekte, Farben und Animationen in Echtzeit testen und als Presets speichern möchten. Sie löst das Problem, komplexe 3D-Parameter mühsam im Code anpassen zu müssen, indem sie eine intuitive Benutzeroberfläche zur Feinjustierung bietet.
 
-Currently, two official plugins are available:
+## Features
+- **Echtzeit-3D-Rendering**: Visualisierung eines konfigurierbaren Orbs mittels Three.js und Shadern.
+- **Detaillierte Konfiguration**: Anpassung von Parametern wie Rotation, Noise, Farben, Glow und Partikeldichte.
+- **Preset-Management**: Speichern und Laden von Konfigurationen (Standard-Presets und benutzerdefinierte Presets).
+- **Export-Funktion**: Kopieren der aktuellen Konfiguration als JSON oder TypeScript-Code.
+- **Responsive UI**: Unterteilt in übersichtliche Bereiche für Look, Motion und Details.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech-Stack
+- **Frontend**: React 19, TypeScript
+- **Styling**: Tailwind CSS (Utility-First), CSS Modules
+- **3D / Grafik**: Three.js, Custom WebGL Shader (GLSL)
+- **State Management**: Zustand
+- **Build-Tools**: Vite, npm
 
-## React Compiler
+## Projektstruktur
+Die wichtigsten Ordner und Dateien im Überblick:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `src/` – Hauptquellcode der Anwendung
+  - `src/core/` – Kernlogik für 3D-Rendering (Engine, Config, Shader)
+  - `src/state/` – Globales State Management (Zustand Stores)
+  - `src/ui/` – Benutzeroberfläche (Panels, Controls, Layout)
+  - `src/utils/` – Hilfsfunktionen
+- `public/` – Statische Assets
+- `tailwind.config.js` – Konfiguration für Tailwind CSS
+- `vite.config.ts` – Konfiguration für den Build-Prozess
 
-## Expanding the ESLint configuration
+## Voraussetzungen
+- Node.js (empfohlen: v18 oder höher)
+- npm (wird standardmäßig mit Node.js installiert)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Installation & Setup
+1. Repository clonen (oder in das Verzeichnis wechseln):
+   ```bash
+   cd orb-studio
+   ```
+2. Abhängigkeiten installieren:
+   ```bash
+   npm install
+   ```
+3. Lokalen Development-Server starten:
+   ```bash
+   npm run dev
+   ```
+   Die Anwendung ist anschließend unter `http://localhost:5173` (oder einem ähnlichen Port) erreichbar.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Konfiguration
+Das Projekt verwendet Standard-Konfigurationsdateien:
+- **`tailwind.config.js`**: Definiert die Pfade für Tailwind CSS.
+- **`vite.config.ts`**: Steuert den Vite-Build-Prozess und Plugins (React).
+- **`tsconfig.json`**: TypeScript-Compiler-Einstellungen.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Wichtige Umgebungsvariablen sind aktuell nicht erforderlich.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Nutzung
+Nach dem Start (`npm run dev`) öffnet sich die Web-Oberfläche.
+
+### Hauptbereiche:
+- **Canvas (Mitte)**: Zeigt die Echtzeit-Vorschau des Orbs.
+- **Sidebar (Links)**:
+  - **Look**: Farben, Verlauf und Leuchteffekte (Glow).
+  - **Motion**: Rotation und Noise-Bewegung.
+  - **Details**: Partikeldichte, Bänder und Animationsschleifen.
+  - **Presets**: Laden von vordefinierten Stilen oder Speichern eigener Kreationen.
+- **Header**: Buttons zum Kopieren der aktuellen Konfiguration (`Copy JSON`, `Copy TS`).
+
+## Tests & Qualitätssicherung
+- **Linting**:
+  Überprüfung des Codes auf Stil- und Syntaxfehler:
+  ```bash
+  npm run lint
+  ```
+- **Build-Test**:
+  Erstellen des Produktions-Builds zur Verifizierung:
+  ```bash
+  npm run build
+  ```
+
+## Deployment
+Das Projekt ist eine statische Webanwendung (SPA) und kann auf jedem statischen Hoster deployed werden.
+
+Build-Befehl für das Deployment:
+```bash
+npm run build
 ```
+Das Ergebnis liegt im Ordner `dist/`.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Beispiele für Hoster:
+- **Vercel / Netlify / Cloudflare Pages**: Einfach das Repository verbinden und `npm run build` als Build-Command sowie `dist` als Output-Directory angeben.
+- **Docker / Nginx**: Den Inhalt von `dist/` auf einen Webserver kopieren.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Lizenz
+MIT License (siehe `LICENSE` Datei im Hauptverzeichnis).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Autor
+Entwickelt von **daydaylx**.
