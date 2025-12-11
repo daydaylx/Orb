@@ -1,0 +1,39 @@
+{
+  "id": "core-red-blue-plasma",
+  "name": "Core Plasma",
+  "version": 1,
+  "rendering": {
+    "baseRadius": 0.6,
+    "colors": {
+      "inner": "#ff0000",
+      "outer": "#0000ff",
+      "accent": "#ffff00",
+      "background": "#000000",
+      "gradientBias": 0.4
+    },
+    "rotation": {
+      "xSpeed": 0.3,
+      "ySpeed": 0.1
+    },
+    "noise": {
+      "scale": 1.2,
+      "intensity": 0.8,
+      "speed": 0.2,
+      "detail": 0.5
+    },
+    "glow": {
+      "intensity": 0.7,
+      "threshold": 0.1,
+      "radius": 0.5
+    },
+    "details": {
+      "bandCount": 0,
+      "bandSharpness": 0.5,
+      "particleDensity": 0
+    }
+  },
+  "meta": {
+    "description": "A vibrant plasma orb with red core and blue outer shell.",
+    "tags": ["plasma", "energy", "core"]
+  }
+}

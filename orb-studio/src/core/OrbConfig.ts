@@ -1,52 +1,93 @@
 
-export type OrbConfig = {
+export interface OrbConfigInternal {
   id: string;
-  label: string;
+  name: string; // Renamed from label to name to match requirements if needed, or keeping label? Prompt says name/label. I will use name for consistency with external.
 
-  baseRadius: number; // 0.1–1.0
+  // Internal UI state or full config
+  baseRadius: number;
 
   rotation: {
-    xSpeed: number; // rad/s
+    xSpeed: number;
     ySpeed: number;
   };
 
   noise: {
     scale: number;
-    intensity: number; // 0–1
-    speed: number;     // 0–?
-    detail: number;    // 0–1
+    intensity: number;
+    speed: number;
+    detail: number;
   };
 
   colors: {
-    inner: string;      // "#RRGGBB"
+    inner: string;
     outer: string;
     accent: string;
     background: string;
-    gradientBias: number; // 0–1 (wie stark nach außen gezogen)
+    gradientBias: number;
   };
 
   glow: {
-    intensity: number;  // 0–1
-    threshold: number;  // 0–1
-    radius: number;     // 0–1
+    intensity: number;
+    threshold: number;
+    radius: number;
   };
 
   details: {
-    bandCount: number;      // 0 = keine
-    bandSharpness: number;  // 0–1
-    particleDensity: number;// 0–1
+    bandCount: number;
+    bandSharpness: number;
+    particleDensity: number;
   };
 
   animation: {
-    loopSeconds: number;    // 2, 3, 5, 10…
+    loopSeconds: number;
   };
 
-  version: 1;               // für spätere Shader-Änderungen
-};
+  version: 1;
+}
 
-export const DEFAULT_ORB_CONFIG: OrbConfig = {
+export interface OrbConfigExternalV1 {
+  id: string;
+  name: string;
+  version: 1;
+  rendering: {
+    baseRadius: number;
+    colors: {
+      inner: string;
+      outer: string;
+      accent: string;
+      background: string;
+      gradientBias: number;
+    };
+    rotation: {
+      xSpeed: number;
+      ySpeed: number;
+    };
+    noise?: {
+      scale: number;
+      intensity: number;
+      speed: number;
+      detail: number;
+    };
+    glow?: {
+      intensity: number;
+      threshold: number;
+      radius: number;
+    };
+    details?: {
+      bandCount: number;
+      bandSharpness: number;
+      particleDensity: number;
+    };
+  };
+  meta?: {
+    description?: string;
+    tags?: string[];
+  };
+}
+
+export const DEFAULT_ORB_CONFIG: OrbConfigInternal = {
   id: 'default',
-  label: 'Default Orb',
+  name: 'Default Orb',
   baseRadius: 0.5,
   rotation: {
     xSpeed: 0.2,
@@ -80,3 +121,27 @@ export const DEFAULT_ORB_CONFIG: OrbConfig = {
   },
   version: 1,
 };
+
+export function toExternalConfig(config: OrbConfigInternal): OrbConfigExternalV1 {
+  return {
+    id: config.id,
+    name: config.name,
+    version: 1,
+    rendering: {
+      baseRadius: config.baseRadius,
+      colors: { ...config.colors },
+      rotation: { ...config.rotation },
+      noise: { ...config.noise },
+      glow: { ...config.glow },
+      details: { ...config.details },
+    },
+  };
+}
+
+export function exportOrbConfigToJson(config: OrbConfigInternal): string {
+  const external = toExternalConfig(config);
+  return JSON.stringify(external, null, 2);
+}
+
+// For compatibility with existing code that might import OrbConfig
+export type OrbConfig = OrbConfigInternal;

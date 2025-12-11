@@ -3,7 +3,7 @@ import type { OrbConfig } from '../core/OrbConfig';
 export const defaultPresets: OrbConfig[] = [
   {
     id: 'purple-energy',
-    label: 'Purple Energy',
+    name: 'Purple Energy',
     baseRadius: 0.5,
     rotation: { xSpeed: 0.2, ySpeed: 0.1 },
     noise: { scale: 1.0, intensity: 0.5, speed: 0.2, detail: 0.5 },
@@ -15,7 +15,7 @@ export const defaultPresets: OrbConfig[] = [
   },
   {
     id: 'blue-plasma',
-    label: 'Blue Plasma',
+    name: 'Blue Plasma',
     baseRadius: 0.6,
     rotation: { xSpeed: 0.3, ySpeed: 0.2 },
     noise: { scale: 1.5, intensity: 0.7, speed: 0.3, detail: 0.6 },
@@ -27,7 +27,7 @@ export const defaultPresets: OrbConfig[] = [
   },
    {
     id: 'orange-ember',
-    label: 'Orange Ember',
+    name: 'Orange Ember',
     baseRadius: 0.55,
     rotation: { xSpeed: 0.1, ySpeed: 0.05 },
     noise: { scale: 0.8, intensity: 0.6, speed: 0.1, detail: 0.4 },

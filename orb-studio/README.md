@@ -1,73 +1,57 @@
-# React + TypeScript + Vite
+# Orb-Studio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ein eigenständiges Autorentool zum Erstellen und Konfigurieren von visuellen Orbs (3D-Sphären) für die Verwendung in externen Anwendungen.
 
-Currently, two official plugins are available:
+## Über Orb-Studio
+Orb-Studio ist ein spezialisierter Editor für "Orbs". Es ermöglicht die visuelle Gestaltung von 3D-Kugeln mit verschiedenen Parametern wie Farben, Gradienten, Rotation und Effekten. Das Ziel ist es, diese Konfigurationen als **JSON** zu exportieren, damit sie von anderen Systemen (z. B. Disa) gerendert werden können.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Es gibt **keine** direkte Code-Abhängigkeit zu den konsumierenden Projekten; die Schnittstelle ist rein datengetrieben.
 
-## React Compiler
+## Tech-Stack
+- **Framework:** React (Vite)
+- **Sprache:** TypeScript
+- **Rendering:** Three.js (@react-three/fiber, @react-three/drei)
+- **State Management:** Zustand
+- **Styling:** CSS Modules / Standard CSS (Tailwind möglich, falls konfiguriert)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Setup & Entwicklung
 
-## Expanding the ESLint configuration
+### Voraussetzungen
+- Node.js (empfohlen: v18+ oder v20+)
+- npm oder pnpm
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Installation
+```bash
+cd orb-studio
+npm install
+# oder
+pnpm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Starten (Development)
+Startet den Dev-Server unter `http://localhost:5173`.
+```bash
+npm run dev
 ```
+
+### Build
+Erstellt das optimierte Build-Artefakt im `dist/` Ordner.
+```bash
+npm run build
+```
+
+## Projektstruktur
+
+- `src/core/`: Kernlogik für die 3D-Engine, Shader, Config-Definitionen.
+- `src/state/`: Globales State Management (Zustand Stores).
+- `src/ui/`: React-Komponenten für das Editor-Interface (Layout, Controls).
+- `src/presets/`: Vordefinierte Orb-Konfigurationen (optional).
+- `src/utils/`: Allgemeine Hilfsfunktionen.
+
+## Beispiel-Orbs
+Im Ordner `examples/` finden sich Beispiel-Konfigurationen im JSON-Format. Details zum Format sind in `docs/orb-config-spec.md` dokumentiert.
+
+## Aktueller Status
+- **Studio-Funktionen:** Multi-Orb-Verwaltung (Liste, Erstellen, Löschen), lokale Persistenz.
+- **Rendering:** Voller Shader-Support für Farben, Noise, Glow und Details.
+- **Export:** JSON-Export (Clipboard/File) implementiert.

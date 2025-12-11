@@ -1,0 +1,39 @@
+{
+  "id": "tech-cyan-grid-orb",
+  "name": "Tech Grid Orb",
+  "version": 1,
+  "rendering": {
+    "baseRadius": 0.55,
+    "colors": {
+      "inner": "#008b8b",
+      "outer": "#00ffff",
+      "accent": "#ccffff",
+      "background": "#001a1a",
+      "gradientBias": 0.5
+    },
+    "rotation": {
+      "xSpeed": 0.0,
+      "ySpeed": 0.4
+    },
+    "noise": {
+      "scale": 0.1,
+      "intensity": 0.1,
+      "speed": 0.0,
+      "detail": 0.0
+    },
+    "glow": {
+      "intensity": 0.9,
+      "threshold": 0.3,
+      "radius": 0.4
+    },
+    "details": {
+      "bandCount": 10,
+      "bandSharpness": 0.9,
+      "particleDensity": 0
+    }
+  },
+  "meta": {
+    "description": "A high-tech looking orb with sharp bands resembling a grid or interference pattern.",
+    "tags": ["tech", "cyan", "grid"]
+  }
+}

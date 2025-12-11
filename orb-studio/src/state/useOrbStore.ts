@@ -1,36 +1,100 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { DEFAULT_ORB_CONFIG } from '../core/OrbConfig';
-import type { OrbConfig } from '../core/OrbConfig';
+import type { OrbConfigInternal } from '../core/OrbConfig';
 
-interface OrbState {
-  config: OrbConfig;
-  setConfig: (config: Partial<OrbConfig>) => void;
+interface OrbStoreState {
+  orbs: OrbConfigInternal[];
+  activeOrbId: string;
+
+  // Computed property for convenience (get active config)
+  config: OrbConfigInternal;
+
+  // Actions
+  createOrb: (initial?: Partial<OrbConfigInternal>) => void;
+  duplicateOrb: (id: string) => void;
+  deleteOrb: (id: string) => void;
+  setActiveOrb: (id: string) => void;
+  updateActiveOrb: (partial: Partial<OrbConfigInternal> | ((prev: OrbConfigInternal) => Partial<OrbConfigInternal>)) => void;
+
+  // Deprecated/Legacy support during transition (maps to active orb)
+  setConfig: (config: Partial<OrbConfigInternal>) => void;
   resetToDefault: () => void;
 }
 
-export const useOrbStore = create<OrbState>((set) => ({
-  config: DEFAULT_ORB_CONFIG,
-  setConfig: (partial) =>
-    set((state) => {
-        // Deep merge for nested objects if necessary, but for now simple spread
-        // However, since we have nested objects (rotation, noise, etc), we need to be careful.
-        // The `partial` in `setConfig` in the plan implies we might want to update parts.
-        // For simplicity, let's assume `partial` is a partial of the full object or we implement specific updaters.
-        // The plan says: `setConfig(partial)`.
+export const useOrbStore = create<OrbStoreState>()(
+  persist(
+    (set, get) => ({
+      orbs: [DEFAULT_ORB_CONFIG],
+      activeOrbId: DEFAULT_ORB_CONFIG.id,
 
-        // A simple recursive merge or using libraries like immer is better.
-        // But for "no overkill", let's assume the caller passes the full structure or we handle top level keys.
-        // Actually, let's make setConfig accept a Partial<OrbConfig> and we merge it shallowly for top level keys,
-        // but for nested keys, we might need a deep merge utility or just replace.
-        // The plan says: "Immer immutable Updates ({ ...old, rotation: { ...old.rotation, xSpeed: newVal } })"
+      get config() {
+        const { orbs, activeOrbId } = get();
+        return orbs.find((o) => o.id === activeOrbId) || orbs[0] || DEFAULT_ORB_CONFIG;
+      },
 
-        // So the caller is responsible for the structure, or we provide helper methods.
-        // The plan says: `setConfig(partial)`.
+      createOrb: (initial) => set((state) => {
+        const newOrb: OrbConfigInternal = {
+          ...DEFAULT_ORB_CONFIG,
+          ...initial,
+          id: crypto.randomUUID(),
+          name: initial?.name || `Orb ${state.orbs.length + 1}`,
+        };
+        return {
+          orbs: [...state.orbs, newOrb],
+          activeOrbId: newOrb.id,
+        };
+      }),
 
-        // Let's implement a shallow merge for now, and rely on caller to spread nested objects if they only update one field.
-        // Or better, since `zustand` `set` merges state, but here we have `config` object.
+      duplicateOrb: (id) => set((state) => {
+        const orbToDuplicate = state.orbs.find((o) => o.id === id);
+        if (!orbToDuplicate) return {};
+        const newOrb = {
+          ...orbToDuplicate,
+          id: crypto.randomUUID(),
+          name: `${orbToDuplicate.name} (Copy)`,
+        };
+        return {
+          orbs: [...state.orbs, newOrb],
+          activeOrbId: newOrb.id,
+        };
+      }),
 
-        return { config: { ...state.config, ...partial } };
+      deleteOrb: (id) => set((state) => {
+        if (state.orbs.length <= 1) return {}; // Prevent deleting the last orb
+        const newOrbs = state.orbs.filter((o) => o.id !== id);
+        let newActiveId = state.activeOrbId;
+        if (state.activeOrbId === id) {
+          newActiveId = newOrbs[0].id;
+        }
+        return {
+          orbs: newOrbs,
+          activeOrbId: newActiveId,
+        };
+      }),
+
+      setActiveOrb: (id) => set({ activeOrbId: id }),
+
+      updateActiveOrb: (partial) => set((state) => {
+        const activeOrb = state.orbs.find((o) => o.id === state.activeOrbId);
+        if (!activeOrb) return {};
+
+        const updates = typeof partial === 'function' ? partial(activeOrb) : partial;
+        const updatedOrb = { ...activeOrb, ...updates };
+
+        return {
+          orbs: state.orbs.map((o) => (o.id === state.activeOrbId ? updatedOrb : o)),
+        };
+      }),
+
+      // Legacy/Compatibility
+      setConfig: (partial) => get().updateActiveOrb(partial),
+      resetToDefault: () => get().updateActiveOrb(DEFAULT_ORB_CONFIG),
     }),
-  resetToDefault: () => set({ config: DEFAULT_ORB_CONFIG }),
-}));
+    {
+      name: 'orb-studio-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ orbs: state.orbs, activeOrbId: state.activeOrbId }),
+    }
+  )
+);

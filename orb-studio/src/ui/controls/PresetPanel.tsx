@@ -7,17 +7,14 @@ export const PresetPanel: React.FC = () => {
   const { presets, addPreset, deletePreset } = usePresetStore();
   const { config, setConfig } = useOrbStore();
 
-  // Combine default presets with user presets, ensuring no duplicates by ID if user overrides
-  // For now just list both.
-
   const handleLoad = (preset: import('../../core/OrbConfig').OrbConfig) => {
     setConfig(preset);
   };
 
   const handleSave = () => {
-    const name = prompt('Enter preset name:', config.label || 'My Preset');
+    const name = prompt('Enter preset name:', config.name || 'My Preset');
     if (name) {
-      addPreset({ ...config, id: crypto.randomUUID(), label: name });
+      addPreset({ ...config, id: crypto.randomUUID(), name: name });
     }
   };
 
@@ -33,7 +30,7 @@ export const PresetPanel: React.FC = () => {
         <div className="space-y-2">
             {defaultPresets.map(p => (
                 <div key={p.id} className="flex justify-between items-center bg-gray-800 p-2 rounded cursor-pointer hover:bg-gray-700" onClick={() => handleLoad(p)}>
-                    <span className="text-sm">{p.label}</span>
+                    <span className="text-sm">{p.name}</span>
                 </div>
             ))}
         </div>
@@ -45,7 +42,7 @@ export const PresetPanel: React.FC = () => {
             <div className="space-y-2">
                 {presets.map(p => (
                     <div key={p.id} className="flex justify-between items-center bg-gray-800 p-2 rounded">
-                        <span className="text-sm cursor-pointer flex-1" onClick={() => handleLoad(p)}>{p.label}</span>
+                        <span className="text-sm cursor-pointer flex-1" onClick={() => handleLoad(p)}>{p.name}</span>
                         <button onClick={(e) => { e.stopPropagation(); deletePreset(p.id); }} className="text-xs text-red-500 hover:text-red-400 ml-2">Del</button>
                     </div>
                 ))}

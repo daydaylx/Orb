@@ -1,0 +1,39 @@
+{
+  "id": "calm-soft-purple-glow",
+  "name": "Soft Purple Glow",
+  "version": 1,
+  "rendering": {
+    "baseRadius": 0.5,
+    "colors": {
+      "inner": "#e0b0ff",
+      "outer": "#4b0082",
+      "accent": "#ffffff",
+      "background": "#100020",
+      "gradientBias": 0.7
+    },
+    "rotation": {
+      "xSpeed": 0.05,
+      "ySpeed": 0.05
+    },
+    "noise": {
+      "scale": 0.5,
+      "intensity": 0.2,
+      "speed": 0.1,
+      "detail": 0.3
+    },
+    "glow": {
+      "intensity": 0.4,
+      "threshold": 0.0,
+      "radius": 0.8
+    },
+    "details": {
+      "bandCount": 0,
+      "bandSharpness": 0,
+      "particleDensity": 0
+    }
+  },
+  "meta": {
+    "description": "A calm, slow-moving orb with soft purple hues.",
+    "tags": ["calm", "purple", "soft"]
+  }
+}
