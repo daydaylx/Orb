@@ -1,0 +1,40 @@
+import type { OrbConfig } from '../core/OrbConfig';
+
+export const defaultPresets: OrbConfig[] = [
+  {
+    id: 'purple-energy',
+    label: 'Purple Energy',
+    baseRadius: 0.5,
+    rotation: { xSpeed: 0.2, ySpeed: 0.1 },
+    noise: { scale: 1.0, intensity: 0.5, speed: 0.2, detail: 0.5 },
+    colors: { inner: '#ff00ff', outer: '#4b0082', accent: '#00ffff', background: '#000000', gradientBias: 0.5 },
+    glow: { intensity: 0.6, threshold: 0.1, radius: 0.5 },
+    details: { bandCount: 0, bandSharpness: 0.5, particleDensity: 0 },
+    animation: { loopSeconds: 10 },
+    version: 1,
+  },
+  {
+    id: 'blue-plasma',
+    label: 'Blue Plasma',
+    baseRadius: 0.6,
+    rotation: { xSpeed: 0.3, ySpeed: 0.2 },
+    noise: { scale: 1.5, intensity: 0.7, speed: 0.3, detail: 0.6 },
+    colors: { inner: '#00ffff', outer: '#0000ff', accent: '#ffffff', background: '#000000', gradientBias: 0.6 },
+    glow: { intensity: 0.8, threshold: 0.2, radius: 0.6 },
+    details: { bandCount: 3, bandSharpness: 0.7, particleDensity: 0.2 },
+    animation: { loopSeconds: 5 },
+    version: 1,
+  },
+   {
+    id: 'orange-ember',
+    label: 'Orange Ember',
+    baseRadius: 0.55,
+    rotation: { xSpeed: 0.1, ySpeed: 0.05 },
+    noise: { scale: 0.8, intensity: 0.6, speed: 0.1, detail: 0.4 },
+    colors: { inner: '#ff4500', outer: '#8b0000', accent: '#ffff00', background: '#1a0500', gradientBias: 0.4 },
+    glow: { intensity: 0.5, threshold: 0.0, radius: 0.4 },
+    details: { bandCount: 0, bandSharpness: 0.0, particleDensity: 0.5 },
+    animation: { loopSeconds: 8 },
+    version: 1,
+  },
+];
