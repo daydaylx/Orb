@@ -2,22 +2,22 @@ import React from 'react';
 import { usePresetStore } from '../../state/usePresetStore';
 import { useOrbStore } from '../../state/useOrbStore';
 import { defaultPresets } from '../../presets/defaultPresets';
+import type { OrbConfigInternal } from '../../core/OrbConfig'; // Import both for type consistency
 
 export const PresetPanel: React.FC = () => {
   const { presets, addPreset, deletePreset } = usePresetStore();
-  const { config, setConfig } = useOrbStore();
+  const createOrb = useOrbStore((state) => state.createOrb);
+  const activeOrb = useOrbStore((state) => state.orbs.find((orb) => orb.id === state.activeOrbId));
 
-  // Combine default presets with user presets, ensuring no duplicates by ID if user overrides
-  // For now just list both.
-
-  const handleLoad = (preset: import('../../core/OrbConfig').OrbConfig) => {
-    setConfig(preset);
+  const handleLoad = (preset: OrbConfigInternal) => {
+    createOrb(preset); // Load preset as a new orb
   };
 
   const handleSave = () => {
-    const name = prompt('Enter preset name:', config.label || 'My Preset');
+    if (!activeOrb) return;
+    const name = prompt('Enter preset name:', activeOrb.label || 'My Preset');
     if (name) {
-      addPreset({ ...config, id: crypto.randomUUID(), label: name });
+      addPreset({ ...activeOrb, id: crypto.randomUUID(), label: name });
     }
   };
 

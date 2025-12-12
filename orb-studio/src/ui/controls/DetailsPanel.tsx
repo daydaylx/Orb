@@ -3,31 +3,32 @@ import { useOrbStore } from '../../state/useOrbStore';
 import { Slider } from '../common/Slider';
 
 export const DetailsPanel: React.FC = () => {
-  const { config, setConfig } = useOrbStore();
+  const activeOrb = useOrbStore((state) => state.orbs.find((orb) => orb.id === state.activeOrbId));
+  const updateActiveOrb = useOrbStore((state) => state.updateActiveOrb);
 
-  const updateDetails = (key: keyof typeof config.details, value: number) => {
-    setConfig({
-      ...config,
-      details: { ...config.details, [key]: value },
-    });
+  if (!activeOrb) return null;
+
+  const updateDetails = (key: keyof typeof activeOrb.details, value: number) => {
+    updateActiveOrb((prev) => ({
+      details: { ...prev.details, [key]: value },
+    }));
   };
 
-  const updateAnimation = (key: keyof typeof config.animation, value: number) => {
-    setConfig({
-      ...config,
-      animation: { ...config.animation, [key]: value },
-    });
+  const updateAnimation = (key: keyof typeof activeOrb.animation, value: number) => {
+    updateActiveOrb((prev) => ({
+      animation: { ...prev.animation, [key]: value },
+    }));
   };
 
   return (
     <div className="space-y-6">
       <h3 className="text-md font-semibold text-gray-300 border-b border-gray-700 pb-2">Details</h3>
-      <Slider label="Band Count" value={config.details.bandCount} min={0} max={20} step={1} onChange={(v) => updateDetails('bandCount', v)} />
-      <Slider label="Band Sharpness" value={config.details.bandSharpness} min={0} max={1} onChange={(v) => updateDetails('bandSharpness', v)} />
-      <Slider label="Particle Density" value={config.details.particleDensity} min={0} max={1} onChange={(v) => updateDetails('particleDensity', v)} />
+      <Slider label="Band Count" value={activeOrb.details.bandCount} min={0} max={20} step={1} onChange={(v) => updateDetails('bandCount', v)} />
+      <Slider label="Band Sharpness" value={activeOrb.details.bandSharpness} min={0} max={1} onChange={(v) => updateDetails('bandSharpness', v)} />
+      <Slider label="Particle Density" value={activeOrb.details.particleDensity} min={0} max={1} onChange={(v) => updateDetails('particleDensity', v)} />
 
        <h3 className="text-md font-semibold text-gray-300 border-b border-gray-700 pb-2 pt-4">Animation</h3>
-      <Slider label="Loop Seconds" value={config.animation.loopSeconds} min={1} max={60} step={1} onChange={(v) => updateAnimation('loopSeconds', v)} />
+      <Slider label="Loop Seconds" value={activeOrb.animation.loopSeconds} min={1} max={60} step={1} onChange={(v) => updateAnimation('loopSeconds', v)} />
     </div>
   );
 };

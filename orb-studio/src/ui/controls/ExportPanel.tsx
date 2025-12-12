@@ -3,12 +3,14 @@ import { useOrbStore } from '../../state/useOrbStore';
 import { exportOrbConfigToJson } from '../../core/OrbConfig';
 
 export const ExportPanel: React.FC = () => {
-  const { config } = useOrbStore();
+  const activeOrb = useOrbStore((state) => state.orbs.find((orb) => orb.id === state.activeOrbId));
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+
+  if (!activeOrb) return null;
 
   const handleCopy = async () => {
     try {
-      const json = exportOrbConfigToJson(config);
+      const json = exportOrbConfigToJson(activeOrb);
       await navigator.clipboard.writeText(json);
       setCopyFeedback('Copied!');
       setTimeout(() => setCopyFeedback(null), 2000);
@@ -19,12 +21,12 @@ export const ExportPanel: React.FC = () => {
   };
 
   const handleDownload = () => {
-    const json = exportOrbConfigToJson(config);
+    const json = exportOrbConfigToJson(activeOrb);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `orb-${config.id || 'config'}.json`;
+    a.download = `orb-${activeOrb.id || 'config'}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
