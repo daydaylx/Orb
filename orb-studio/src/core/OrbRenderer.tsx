@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import type { OrbConfig } from './OrbConfig';
+import type { OrbConfigInternal } from './OrbConfig';
 import { OrbEngine } from './OrbEngine';
 
 interface OrbRendererProps {
-  config: OrbConfig;
+  config: OrbConfigInternal;
   className?: string;
 }
 

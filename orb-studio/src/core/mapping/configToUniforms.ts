@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { OrbConfig } from '../OrbConfig';
+import type { OrbConfigInternal } from '../OrbConfig';
 
 export type OrbUniforms = {
   u_time: { value: number };
@@ -19,7 +19,7 @@ export type OrbUniforms = {
   u_particleDensity: { value: number };
 };
 
-export const createOrbUniforms = (config: OrbConfig): OrbUniforms => {
+export const createOrbUniforms = (config: OrbConfigInternal): OrbUniforms => {
   return {
     u_time: { value: 0 },
     u_baseRadius: { value: config.baseRadius },
@@ -39,7 +39,7 @@ export const createOrbUniforms = (config: OrbConfig): OrbUniforms => {
   };
 };
 
-export const updateOrbUniforms = (uniforms: OrbUniforms, config: OrbConfig) => {
+export const updateOrbUniforms = (uniforms: OrbUniforms, config: OrbConfigInternal) => {
   uniforms.u_baseRadius.value = config.baseRadius;
   uniforms.u_colorInner.value.set(config.colors.inner);
   uniforms.u_colorOuter.value.set(config.colors.outer);
