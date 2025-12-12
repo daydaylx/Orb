@@ -1,0 +1,39 @@
+{
+  "id": "tech-cyan-grid",
+  "name": "Tech Grid",
+  "version": 1,
+  "rendering": {
+    "baseRadius": 0.55,
+    "colors": {
+      "inner": "#000000",
+      "outer": "#00ffff",
+      "accent": "#0088ff",
+      "background": "#001111",
+      "gradientBias": 0.2
+    },
+    "rotation": {
+      "xSpeed": 0.0,
+      "ySpeed": 0.5
+    },
+    "noise": {
+      "scale": 0.5,
+      "intensity": 0.1,
+      "speed": 0.2,
+      "detail": 0.0
+    },
+    "glow": {
+      "intensity": 0.5,
+      "radius": 0.4,
+      "threshold": 0.5
+    },
+    "details": {
+      "bandCount": 15,
+      "bandSharpness": 0.9,
+      "particleDensity": 0.0
+    }
+  },
+  "meta": {
+    "description": "A digital, grid-like orb with sharp cyan bands.",
+    "tags": ["tech", "cyan", "grid", "digital"]
+  }
+}

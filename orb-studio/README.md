@@ -62,11 +62,17 @@ Nach dem Start (`npm run dev`) öffnet sich die Web-Oberfläche.
 ### Hauptbereiche:
 - **Canvas (Mitte)**: Zeigt die Echtzeit-Vorschau des Orbs.
 - **Sidebar (Links)**:
+  - **Orbs**: Verwaltung mehrerer Orbs (Neu, Duplizieren, Löschen).
   - **Look**: Farben, Verlauf und Leuchteffekte (Glow).
   - **Motion**: Rotation und Noise-Bewegung.
   - **Details**: Partikeldichte, Bänder und Animationsschleifen.
-  - **Presets**: Laden von vordefinierten Stilen oder Speichern eigener Kreationen.
-- **Header**: Buttons zum Kopieren der aktuellen Konfiguration (`Copy JSON`, `Copy TS`).
+  - **Presets**: Laden von vordefinierten Stilen.
+  - **Export**: Exportieren der Config als JSON.
+- **Header**: Titelzeile.
+
+## Beispiel-Orbs
+Im Ordner `../examples` (vom Repo-Root aus) finden sich kuratierte JSON-Konfigurationen (z. B. Plasma, Calm Purple, Tech Grid), die zeigen, was mit dem Orb Studio möglich ist. 
+Details zum Format und zur Verwendung in anderen Projekten gibt es in `../docs/orb-config-spec.md`.
 
 ## Tests & Qualitätssicherung
 - **Linting**:

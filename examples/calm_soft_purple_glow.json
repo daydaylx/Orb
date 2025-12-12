@@ -1,0 +1,39 @@
+{
+  "id": "calm-soft-purple",
+  "name": "Calm Purple",
+  "version": 1,
+  "rendering": {
+    "baseRadius": 0.5,
+    "colors": {
+      "inner": "#e0c3fc",
+      "outer": "#8ec5fc",
+      "accent": "#ffffff",
+      "background": "#1a1a2e",
+      "gradientBias": 0.7
+    },
+    "rotation": {
+      "xSpeed": 0.1,
+      "ySpeed": 0.1
+    },
+    "noise": {
+      "scale": 1.0,
+      "intensity": 0.2,
+      "speed": 0.1,
+      "detail": 0.1
+    },
+    "glow": {
+      "intensity": 0.9,
+      "radius": 0.8,
+      "threshold": 0.0
+    },
+    "details": {
+      "bandCount": 0,
+      "bandSharpness": 0.0,
+      "particleDensity": 0.0
+    }
+  },
+  "meta": {
+    "description": "A soothing, soft purple orb suitable for background ambience.",
+    "tags": ["calm", "purple", "soft", "ambient"]
+  }
+}

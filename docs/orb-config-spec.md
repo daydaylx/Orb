@@ -67,3 +67,22 @@ Das Format ist stabil und versioniert.
   }
 }
 ```
+
+## Beispiele
+
+Im Ordner `examples/` befinden sich mehrere Beispiel-Konfigurationen:
+
+*   **`core_red_blue_plasma.json`**: Ein hochenergetischer Plasma-Orb mit starken roten und blauen Farben und viel Noise-Verzerrung.
+*   **`calm_soft_purple_glow.json`**: Ein ruhiger, weicher violetter Orb, geeignet für Ambient-Hintergründe.
+*   **`tech_cyan_grid_orb.json`**: Ein digital anmutender Orb mit scharfen Bändern und Cyan-Farbtönen.
+
+Diese Dateien folgen strikt der `OrbConfigExternalV1`-Spezifikation.
+
+## Verwendung in anderen Projekten
+
+Um diese Orbs in einer anderen Anwendung (z. B. Disa, Three.js-Website) zu nutzen:
+
+1.  **JSON laden**: Importiere die JSON-Datei oder lade sie zur Laufzeit.
+2.  **Mapping**: Mappe die Werte aus dem `rendering`-Objekt auf dein eigenes Shader- oder Partikelsystem.
+    *   Die Parameternamen (z. B. `noise.scale`, `glow.intensity`) sind generisch gewählt und sollten sich leicht auf Uniforms übertragen lassen.
+3.  **Unabhängigkeit**: Beachte, dass nur das JSON-Format die Schnittstelle ist. Du musst nicht den React-Code aus `orb-studio` übernehmen. Ein einfacher Three.js-Shader, der diese Parameter als Uniforms akzeptiert, reicht aus.
