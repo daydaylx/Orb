@@ -9,5 +9,9 @@
     "build": "npm run build --workspace app",
     "lint": "npm run lint --workspace app",
     "ci": "npm run lint --workspace app && npm run build --workspace app"
+  },
+  "dependencies": {
+    "zod": "^4.1.13",
+    "zundo": "^2.3.0"
   }
 }

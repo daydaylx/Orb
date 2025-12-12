@@ -37,11 +37,17 @@ export class OrbEngine {
   private bloomStrengthBase = 1;
 
   constructor(canvas: HTMLCanvasElement) {
+    // WebGL2 capability check
+    const context = canvas.getContext('webgl2');
+    if (!context) {
+      throw new Error('WebGL2 is not available. Please enable hardware acceleration or use a modern browser.');
+    }
+
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
     this.camera.position.z = 2;
 
-    this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, context });
     this.renderer.setSize(canvas.width, canvas.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.pmrem = new PMREMGenerator(this.renderer);
@@ -271,12 +277,46 @@ export class OrbEngine {
   }
 
   public dispose() {
-    if (this.animationId) cancelAnimationFrame(this.animationId);
-    this.renderer.dispose();
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+
+    // Traverse scene and dispose
+    this.scene.traverse((object) => {
+      if ((object as any).isMesh) {
+        const mesh = object as THREE.Mesh;
+        mesh.geometry.dispose();
+        if (Array.isArray(mesh.material)) {
+          mesh.material.forEach((m) => this.disposeMaterial(m));
+        } else {
+          this.disposeMaterial(mesh.material as THREE.Material);
+        }
+      }
+    });
+
+    // Dispose specific passes if they have a dispose method
+    if (this.bloomPass && typeof (this.bloomPass as any).dispose === 'function') (this.bloomPass as any).dispose();
+    if (this.chromaPass && typeof (this.chromaPass as any).dispose === 'function') (this.chromaPass as any).dispose();
+    if (this.grainPass && typeof (this.grainPass as any).dispose === 'function') (this.grainPass as any).dispose();
+    if (this.dofPass && typeof (this.dofPass as any).dispose === 'function') (this.dofPass as any).dispose();
+
+    this.composer.dispose();
     this.pmrem.dispose();
     this.envMap?.dispose();
-    this.composer.dispose();
-    this.material?.dispose();
-    this.orbMesh?.geometry.dispose();
+    this.renderer.dispose();
+    this.renderer.forceContextLoss();
+    this.renderer.domElement = null as any;
+  }
+
+  private disposeMaterial(material: THREE.Material) {
+    material.dispose();
+    // Dispose textures if any
+    for (const key of Object.keys(material)) {
+      const value = (material as any)[key];
+      if (value && typeof value === 'object' && 'isTexture' in value) {
+        (value as THREE.Texture).dispose();
+      }
+    }
   }
 }

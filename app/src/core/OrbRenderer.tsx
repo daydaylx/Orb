@@ -1,6 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, Suspense } from 'react';
 import type { OrbConfigInternal } from './OrbConfig';
-import { OrbEngine } from './OrbEngine';
+
+// Lazy load the engine
+const loadEngine = () => import('./OrbEngine').then(m => m.OrbEngine);
 
 interface OrbRendererProps {
   config: OrbConfigInternal;
@@ -13,22 +15,45 @@ interface OrbRendererProps {
 
 export const OrbRenderer: React.FC<OrbRendererProps> = ({ config, className, quality, playbackMode, scrubT, onFps }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const engineRef = useRef<OrbEngine | null>(null);
+  const engineRef = useRef<any | null>(null);
   const fpsSamples = useRef<number[]>([]);
   const fpsRaf = useRef<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    try {
-      engineRef.current = new OrbEngine(canvasRef.current);
-      engineRef.current.setConfig(config);
-    } catch (e: any) {
-      console.error("Failed to initialize OrbEngine:", e);
-      setError(e.message || "Failed to initialize WebGL context.");
-      return;
+    // Dispose old engine if it exists
+    if (engineRef.current) {
+      engineRef.current.dispose();
+      engineRef.current = null;
     }
+
+    let isMounted = true;
+
+    // Async load engine
+    loadEngine().then((OrbEngineClass) => {
+        if (!isMounted || !canvasRef.current) return;
+
+        try {
+            engineRef.current = new OrbEngineClass(canvasRef.current);
+            engineRef.current.setConfig(config);
+            setLoading(false);
+
+             // Handle resize after engine init
+             if (canvasRef.current.parentElement) {
+                 engineRef.current.resize(canvasRef.current.parentElement.clientWidth, canvasRef.current.parentElement.clientHeight);
+             }
+        } catch (e: any) {
+            console.error("Failed to initialize OrbEngine:", e);
+            setError(e.message || "Failed to initialize WebGL context.");
+        }
+    }).catch(e => {
+        console.error("Failed to load OrbEngine code:", e);
+        setError("Failed to load 3D Engine.");
+    });
+
 
     const handleResize = () => {
       if (canvasRef.current && engineRef.current) {
@@ -39,9 +64,6 @@ export const OrbRenderer: React.FC<OrbRendererProps> = ({ config, className, qua
       }
     };
 
-    // Initial resize to fit container
-    handleResize();
-
     window.addEventListener('resize', handleResize);
 
     // ResizeObserver for container resize
@@ -51,6 +73,7 @@ export const OrbRenderer: React.FC<OrbRendererProps> = ({ config, className, qua
     }
 
     return () => {
+      isMounted = false;
       window.removeEventListener('resize', handleResize);
       resizeObserver.disconnect();
       engineRef.current?.dispose();
@@ -58,7 +81,7 @@ export const OrbRenderer: React.FC<OrbRendererProps> = ({ config, className, qua
       if (fpsRaf.current) cancelAnimationFrame(fpsRaf.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run only once on mount
+  }, [config.id]); // Re-create engine if config ID changes
 
   useEffect(() => {
     if (engineRef.current) {
@@ -140,5 +163,14 @@ export const OrbRenderer: React.FC<OrbRendererProps> = ({ config, className, qua
     );
   }
 
-  return <canvas ref={canvasRef} className={className} style={{ width: '100%', height: '100%', display: 'block' }} />;
+  return (
+    <div className={`relative ${className}`} style={{ width: '100%', height: '100%' }}>
+      {loading && !error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 z-10">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+      <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
+    </div>
+  );
 };
