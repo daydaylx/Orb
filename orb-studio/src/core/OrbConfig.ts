@@ -37,6 +37,13 @@ export type OrbConfigInternal = {
     particleDensity: number;
   };
 
+  bloom: {
+    enabled: boolean;
+    strength: number;
+    radius: number;
+    threshold: number;
+  };
+
   animation: {
     loopSeconds: number;
   };
@@ -77,6 +84,12 @@ export type OrbConfigExternalV1 = {
       bandCount: number;
       bandSharpness: number;
       particleDensity: number;
+    };
+    bloom?: {
+      enabled: boolean;
+      strength: number;
+      radius: number;
+      threshold: number;
     };
   };
   meta?: {
@@ -119,6 +132,12 @@ export const DEFAULT_ORB_CONFIG: OrbConfigInternal = {
     bandSharpness: 0.5,
     particleDensity: 0,
   },
+  bloom: {
+    enabled: true,
+    strength: 1.0,
+    radius: 0.4,
+    threshold: 0.0,
+  },
   animation: {
     loopSeconds: 10,
   },
@@ -137,6 +156,7 @@ export const toExternalConfig = (config: OrbConfigInternal): OrbConfigExternalV1
       noise: { ...config.noise },
       glow: { ...config.glow },
       details: { ...config.details },
+      bloom: { ...config.bloom },
     },
     // Meta is not in Internal yet, so we leave it undefined or empty
   };

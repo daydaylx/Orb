@@ -1,4 +1,8 @@
 import * as THREE from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import type { OrbConfigInternal } from './OrbConfig';
 import { orbVert } from './shader/orb.vert.glsl';
 import { orbFrag } from './shader/orb.frag.glsl';
@@ -8,6 +12,8 @@ export class OrbEngine {
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private renderer: THREE.WebGLRenderer;
+  private composer: EffectComposer;
+  private bloomPass: UnrealBloomPass;
   private orbMesh: THREE.Mesh | null = null;
   private material: THREE.ShaderMaterial | null = null;
   private animationId: number | null = null;
@@ -21,6 +27,21 @@ export class OrbEngine {
     this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     this.renderer.setSize(canvas.width, canvas.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    
+    // Post-processing setup
+    this.composer = new EffectComposer(this.renderer);
+    
+    const renderPass = new RenderPass(this.scene, this.camera);
+    this.composer.addPass(renderPass);
+
+    this.bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(canvas.width, canvas.height),
+      1.5, 0.4, 0.85
+    );
+    this.composer.addPass(this.bloomPass);
+
+    const outputPass = new OutputPass();
+    this.composer.addPass(outputPass);
 
     this.initOrb();
     this.animate();
@@ -71,6 +92,13 @@ export class OrbEngine {
     this.orbMesh.scale.setScalar(config.baseRadius * 2);
     this.renderer.setClearColor(config.colors.background);
 
+    if (config.bloom) {
+        this.bloomPass.enabled = config.bloom.enabled;
+        this.bloomPass.strength = config.bloom.strength;
+        this.bloomPass.radius = config.bloom.radius;
+        this.bloomPass.threshold = config.bloom.threshold;
+    }
+
     this.rotationSpeed = config.rotation;
   }
 
@@ -80,6 +108,7 @@ export class OrbEngine {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
+    this.composer.setSize(width, height);
   }
 
   private animate = () => {
@@ -94,12 +123,13 @@ export class OrbEngine {
        this.orbMesh.rotation.x += this.rotationSpeed.xSpeed * 0.05;
     }
 
-    this.renderer.render(this.scene, this.camera);
+    this.composer.render();
   };
 
   public dispose() {
     if (this.animationId) cancelAnimationFrame(this.animationId);
     this.renderer.dispose();
+    this.composer.dispose();
     this.material?.dispose();
     this.orbMesh?.geometry.dispose();
   }
