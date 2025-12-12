@@ -2,22 +2,34 @@
 
 Dieses Repository enthält den Quellcode für **Orb Studio**, ein Web-Tool zum Erstellen und Konfigurieren von 3D-Orbs.
 
-## Inhalt
+## Projektstruktur
 
-*   **[`orb-studio/`](orb-studio/)**: Das Hauptprojekt (React + Vite + Three.js).
-*   **[`examples/`](examples/)**: Beispiel-Konfigurationen (JSON).
-*   **[`docs/`](docs/)**: Dokumentation (Spezifikation, Integration).
-*   **[`IMPLEMENTATION_LOG.md`](IMPLEMENTATION_LOG.md)**: Protokoll der durchgeführten Entwicklungsschritte.
-*   **[`Plan.md`](Plan.md)**: Der ursprüngliche Architektur-Plan.
+```
+orb/
+├── app/                    # Orb Studio Anwendung (React + Vite + Three.js)
+├── docs/                   # Dokumentation (Spezifikation, Integration)
+├── examples/               # Beispiel-Konfigurationen (JSON)
+├── .dev/                   # Entwicklungsdateien (Logs, Notizen, Implementierungsplan)
+├── LICENSE
+├── README.md
+└── package.json
+```
+
+### Hauptverzeichnisse
+
+*   **[`app/`](app/)**: Die Hauptanwendung - Orb Studio (React + Vite + Three.js)
+*   **[`examples/`](examples/)**: Beispiel-Konfigurationen (JSON) für verschiedene Orb-Styles
+*   **[`docs/`](docs/)**: Technische Dokumentation (API-Spezifikation, Integrationsguide)
+*   **[`.dev/`](.dev/)**: Entwicklungsdateien (Implementation Log, Plan, Logs)
 
 ## Schnellstart
 
 Um das Studio lokal zu starten:
 
 ```bash
-cd orb-studio
+# aus dem Repo-Root
 npm install
 npm run dev
 ```
 
-Weitere Details finden sich in der [Projekt-README](orb-studio/README.md).
+Weitere Details finden sich in der [App-README](app/README.md).
