@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { temporal } from 'zundo';
 import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_ORB_CONFIG } from '../core/OrbConfig';
 import type { OrbConfigInternal } from '../core/OrbConfig';
@@ -15,6 +16,7 @@ interface OrbState {
 }
 
 export const useOrbStore = create<OrbState>()(
+  temporal(
   persist(
     (set, get) => {
       const initialDefault = { ...DEFAULT_ORB_CONFIG, id: uuidv4(), label: 'Default Orb 1' };
@@ -136,6 +138,14 @@ export const useOrbStore = create<OrbState>()(
         return state;
       },
     },
+  ),
+  {
+    limit: 50,
+    partialize: (state) => {
+        const { orbs, activeOrbId } = state;
+        return { orbs, activeOrbId };
+    },
+  }
   ),
 );
 

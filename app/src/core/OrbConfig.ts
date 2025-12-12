@@ -1,4 +1,73 @@
 
+import { z } from 'zod';
+
+// Zod Schema for validation
+export const OrbConfigExternalSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  version: z.literal(1),
+  rendering: z.object({
+    baseRadius: z.number().min(0.1).max(2.0),
+    colors: z.object({
+      inner: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+      outer: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+      accent: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+      background: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+      gradientBias: z.number().min(0).max(1),
+    }),
+    rotation: z.object({
+      xSpeed: z.number(),
+      ySpeed: z.number(),
+    }),
+    animation: z.object({
+      loopSeconds: z.number().min(0.1).optional(),
+      easing: z.enum(['linear', 'easeInOut', 'elastic', 'bounce']).optional(),
+    }).optional(),
+    noise: z.object({
+      scale: z.number(),
+      intensity: z.number(),
+      speed: z.number(),
+      detail: z.number(),
+    }).optional(),
+    glow: z.object({
+      intensity: z.number(),
+      threshold: z.number(),
+      radius: z.number(),
+    }).optional(),
+    details: z.object({
+      bandCount: z.number(),
+      bandSharpness: z.number(),
+      particleDensity: z.number(),
+    }).optional(),
+    bloom: z.object({
+      enabled: z.boolean(),
+      strength: z.number(),
+      radius: z.number(),
+      threshold: z.number(),
+    }).optional(),
+    post: z.object({
+      chromaticAberration: z.boolean().optional(),
+      chromaticAmount: z.number().optional(),
+      vignette: z.number().optional(),
+      filmGrain: z.object({
+        enabled: z.boolean(),
+        intensity: z.number(),
+      }).optional(),
+      dof: z.object({
+        enabled: z.boolean(),
+        focus: z.number(),
+        aperture: z.number(),
+        maxBlur: z.number(),
+      }).optional(),
+    }).optional(),
+  }),
+  meta: z.object({
+    description: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+  }).optional(),
+});
+
+
 export type OrbConfigInternal = {
   id: string;
   label: string; // Internal uses 'label'
@@ -273,4 +342,19 @@ export const fromExternalConfig = (external: OrbConfigExternalV1): OrbConfigInte
     },
     version: 1,
   };
+};
+
+export const importOrbConfig = (jsonString: string): OrbConfigInternal => {
+  try {
+    const json = JSON.parse(jsonString);
+    const parsed = OrbConfigExternalSchema.parse(json);
+    // Explicit cast because Zod inference might be slightly different from the Type manually defined
+    return fromExternalConfig(parsed as OrbConfigExternalV1);
+  } catch (e: any) {
+    if (e instanceof z.ZodError) {
+      const messages = e.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
+      throw new Error(`Validation failed: ${messages}`);
+    }
+    throw new Error(`Invalid JSON: ${e.message}`);
+  }
 };

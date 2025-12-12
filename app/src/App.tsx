@@ -4,6 +4,7 @@ import { MotionPanel } from './ui/controls/MotionPanel';
 import { DetailsPanel } from './ui/controls/DetailsPanel';
 import { PresetPanel } from './ui/controls/PresetPanel';
 import { ExportPanel } from './ui/controls/ExportPanel';
+import { ImportPanel } from './ui/controls/ImportPanel';
 import { OrbPanel } from './ui/controls/OrbPanel'; // Import OrbPanel
 import { Shell } from './ui/layout/Shell';
 import { HeaderBar } from './ui/layout/HeaderBar';
@@ -14,7 +15,7 @@ import { fromExternalConfig } from './core/OrbConfig';
 
 function App() {
   const activeOrb = useOrbStore((state) => state.orbs.find((orb) => orb.id === state.activeOrbId) || state.orbs[0]);
-  const [activeTab, setActiveTab] = useState<'orbs' | 'look' | 'motion' | 'details' | 'presets' | 'export'>('orbs');
+  const [activeTab, setActiveTab] = useState<'orbs' | 'look' | 'motion' | 'details' | 'presets' | 'export' | 'import'>('orbs');
    const [quality, setQuality] = useState<'high' | 'medium' | 'low'>('high');
    const [fps, setFps] = useState<number | null>(null);
    const lowFpsTimer = useRef<number | null>(null);
@@ -31,6 +32,7 @@ function App() {
     { id: 'details', label: 'Details' },
     { id: 'presets', label: 'Presets' },
     { id: 'export', label: 'Export' },
+    { id: 'import', label: 'Import' },
   ] as const;
 
   // Auto downgrade quality if FPS bleibt längere Zeit niedrig
@@ -91,6 +93,7 @@ function App() {
         {activeTab === 'details' && <DetailsPanel />}
         {activeTab === 'presets' && <PresetPanel />}
         {activeTab === 'export' && <ExportPanel />}
+        {activeTab === 'import' && <ImportPanel />}
       </div>
     </div>
   );
