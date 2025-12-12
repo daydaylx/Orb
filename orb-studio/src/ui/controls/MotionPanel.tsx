@@ -22,15 +22,23 @@ export const MotionPanel: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-md font-semibold text-gray-300 border-b border-gray-700 pb-2">Rotation</h3>
-      <Slider label="X Speed" value={activeOrb.rotation.xSpeed} min={-2} max={2} onChange={(v) => updateRotation('xSpeed', v)} />
-      <Slider label="Y Speed" value={activeOrb.rotation.ySpeed} min={-2} max={2} onChange={(v) => updateRotation('ySpeed', v)} />
+      <div>
+        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Rotation</h3>
+        <div className="space-y-4">
+          <Slider label="X Speed" value={activeOrb.rotation.xSpeed} min={-2} max={2} onChange={(v) => updateRotation('xSpeed', v)} />
+          <Slider label="Y Speed" value={activeOrb.rotation.ySpeed} min={-2} max={2} onChange={(v) => updateRotation('ySpeed', v)} />
+        </div>
+      </div>
 
-      <h3 className="text-md font-semibold text-gray-300 border-b border-gray-700 pb-2 pt-4">Noise</h3>
-      <Slider label="Scale" value={activeOrb.noise.scale} min={0.1} max={5} onChange={(v) => updateNoise('scale', v)} />
-      <Slider label="Intensity" value={activeOrb.noise.intensity} min={0} max={1} onChange={(v) => updateNoise('intensity', v)} />
-      <Slider label="Speed" value={activeOrb.noise.speed} min={0} max={2} onChange={(v) => updateNoise('speed', v)} />
-      <Slider label="Detail" value={activeOrb.noise.detail} min={0} max={1} onChange={(v) => updateNoise('detail', v)} />
+      <div>
+        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 border-t border-gray-800 pt-4">Noise</h3>
+        <div className="space-y-4">
+          <Slider label="Scale" value={activeOrb.noise.scale} min={0.1} max={5} onChange={(v) => updateNoise('scale', v)} />
+          <Slider label="Intensity" value={activeOrb.noise.intensity} min={0} max={1} onChange={(v) => updateNoise('intensity', v)} />
+          <Slider label="Speed" value={activeOrb.noise.speed} min={0} max={2} onChange={(v) => updateNoise('speed', v)} />
+          <Slider label="Detail" value={activeOrb.noise.detail} min={0} max={1} onChange={(v) => updateNoise('detail', v)} />
+        </div>
+      </div>
     </div>
   );
 };

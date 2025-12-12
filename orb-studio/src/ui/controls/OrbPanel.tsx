@@ -6,7 +6,7 @@ export const OrbPanel: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-sm font-medium text-gray-300 mb-4 uppercase tracking-wider">Orbs</h3>
+      <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Orbs</h3>
       <div className="space-y-2">
         {orbs.map((orb) => (
           <div

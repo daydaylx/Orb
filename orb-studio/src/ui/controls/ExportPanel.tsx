@@ -36,7 +36,7 @@ export const ExportPanel: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
-        <h3 className="text-sm font-medium text-gray-300 mb-4 uppercase tracking-wider">Export</h3>
+        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Export</h3>
         <div className="space-y-3">
           <button
             onClick={handleCopy}

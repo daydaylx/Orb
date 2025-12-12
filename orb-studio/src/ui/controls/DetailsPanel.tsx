@@ -22,13 +22,21 @@ export const DetailsPanel: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-md font-semibold text-gray-300 border-b border-gray-700 pb-2">Details</h3>
-      <Slider label="Band Count" value={activeOrb.details.bandCount} min={0} max={20} step={1} onChange={(v) => updateDetails('bandCount', v)} />
-      <Slider label="Band Sharpness" value={activeOrb.details.bandSharpness} min={0} max={1} onChange={(v) => updateDetails('bandSharpness', v)} />
-      <Slider label="Particle Density" value={activeOrb.details.particleDensity} min={0} max={1} onChange={(v) => updateDetails('particleDensity', v)} />
+      <div>
+        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Details</h3>
+        <div className="space-y-4">
+          <Slider label="Band Count" value={activeOrb.details.bandCount} min={0} max={20} step={1} onChange={(v) => updateDetails('bandCount', v)} />
+          <Slider label="Band Sharpness" value={activeOrb.details.bandSharpness} min={0} max={1} onChange={(v) => updateDetails('bandSharpness', v)} />
+          <Slider label="Particle Density" value={activeOrb.details.particleDensity} min={0} max={1} onChange={(v) => updateDetails('particleDensity', v)} />
+        </div>
+      </div>
 
-       <h3 className="text-md font-semibold text-gray-300 border-b border-gray-700 pb-2 pt-4">Animation</h3>
-      <Slider label="Loop Seconds" value={activeOrb.animation.loopSeconds} min={1} max={60} step={1} onChange={(v) => updateAnimation('loopSeconds', v)} />
+      <div>
+        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 border-t border-gray-800 pt-4">Animation</h3>
+        <div className="space-y-4">
+          <Slider label="Loop Seconds" value={activeOrb.animation.loopSeconds} min={1} max={60} step={1} onChange={(v) => updateAnimation('loopSeconds', v)} />
+        </div>
+      </div>
     </div>
   );
 };

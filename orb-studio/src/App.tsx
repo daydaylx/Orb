@@ -12,47 +12,33 @@ import { useOrbStore } from './state/useOrbStore';
 
 function App() {
   const activeOrb = useOrbStore((state) => state.orbs.find((orb) => orb.id === state.activeOrbId) || state.orbs[0]);
-  const [activeTab, setActiveTab] = useState<'orbs' | 'look' | 'motion' | 'details' | 'presets' | 'export'>('orbs'); // 'orbs' as initial tab
+  const [activeTab, setActiveTab] = useState<'orbs' | 'look' | 'motion' | 'details' | 'presets' | 'export'>('orbs');
+
+  const tabs = [
+    { id: 'orbs', label: 'Orbs' },
+    { id: 'look', label: 'Look' },
+    { id: 'motion', label: 'Motion' },
+    { id: 'details', label: 'Details' },
+    { id: 'presets', label: 'Presets' },
+    { id: 'export', label: 'Export' },
+  ] as const;
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
-      <div className="flex space-x-1 mb-6 border-b border-gray-800 pb-4 overflow-x-auto">
-        <button
-          onClick={() => setActiveTab('orbs')}
-          className={`px-3 py-1 rounded text-sm ${activeTab === 'orbs' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          Orbs
-        </button>
-        <button
-          onClick={() => setActiveTab('look')}
-          className={`px-3 py-1 rounded text-sm ${activeTab === 'look' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          Look
-        </button>
-        <button
-          onClick={() => setActiveTab('motion')}
-          className={`px-3 py-1 rounded text-sm ${activeTab === 'motion' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          Motion
-        </button>
-        <button
-          onClick={() => setActiveTab('details')}
-          className={`px-3 py-1 rounded text-sm ${activeTab === 'details' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          Details
-        </button>
-        <button
-          onClick={() => setActiveTab('presets')}
-          className={`px-3 py-1 rounded text-sm ${activeTab === 'presets' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          Presets
-        </button>
-        <button
-          onClick={() => setActiveTab('export')}
-          className={`px-3 py-1 rounded text-sm ${activeTab === 'export' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'}`}
-        >
-          Export
-        </button>
+      <div className="grid grid-cols-3 gap-2 mb-6 border-b border-gray-800 pb-4">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-2 py-1.5 rounded text-xs font-medium transition-colors ${
+              activeTab === tab.id
+                ? 'bg-gray-700 text-white shadow-sm'
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
