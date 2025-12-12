@@ -11,6 +11,8 @@ import { orbFrag } from './shader/orb.frag.glsl.ts';
 import { updateOrbUniforms, type OrbUniforms } from './mapping/configToUniforms';
 import { chromaticVignetteShader } from './postprocessing/chromaticVignetteShader';
 import { filmGrainShader } from './postprocessing/filmGrainShader';
+import { PMREMGenerator, Texture, TextureLoader } from 'three';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
 export class OrbEngine {
   private scene: THREE.Scene;
@@ -21,6 +23,8 @@ export class OrbEngine {
   private chromaPass: ShaderPass;
   private grainPass: ShaderPass;
   private dofPass: BokehPass;
+  private pmrem: PMREMGenerator;
+  private envMap: Texture | null = null;
   private orbMesh: THREE.Mesh | null = null;
   private material: THREE.ShaderMaterial | null = null;
   private animationId: number | null = null;
@@ -40,6 +44,8 @@ export class OrbEngine {
     this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     this.renderer.setSize(canvas.width, canvas.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.pmrem = new PMREMGenerator(this.renderer);
+    this.pmrem.compileEquirectangularShader();
     
     // Post-processing setup
     this.composer = new EffectComposer(this.renderer);
@@ -239,9 +245,36 @@ export class OrbEngine {
     this.scrubT = scrubT;
   }
 
+  public async setEnvironment(url: string, isHdr: boolean) {
+    try {
+      const loader = isHdr ? new RGBELoader() : new TextureLoader();
+      const tex = await new Promise<Texture>((resolve, reject) => {
+        (loader as any).load(
+          url,
+          (texture: Texture) => resolve(texture),
+          undefined,
+          (err: any) => reject(err)
+        );
+      });
+      tex.mapping = isHdr ? THREE.EquirectangularReflectionMapping : THREE.EquirectangularReflectionMapping;
+      const rt = this.pmrem.fromEquirectangular(tex);
+      const env = rt.texture;
+      this.scene.environment = env;
+      this.scene.background = env;
+      if (this.envMap) this.envMap.dispose();
+      this.envMap = env;
+      tex.dispose();
+      rt.dispose();
+    } catch (e) {
+      console.warn('Failed to set environment map', e);
+    }
+  }
+
   public dispose() {
     if (this.animationId) cancelAnimationFrame(this.animationId);
     this.renderer.dispose();
+    this.pmrem.dispose();
+    this.envMap?.dispose();
     this.composer.dispose();
     this.material?.dispose();
     this.orbMesh?.geometry.dispose();

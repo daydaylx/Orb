@@ -78,6 +78,31 @@ export const OrbRenderer: React.FC<OrbRendererProps> = ({ config, className, qua
     }
   }, [playbackMode, scrubT]);
 
+  // Drag & drop environment maps (jpg/png/hdr)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault();
+    };
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault();
+      if (!engineRef.current || !e.dataTransfer?.files?.length) return;
+      const file = e.dataTransfer.files[0];
+      const url = URL.createObjectURL(file);
+      const isHdr = file.name.toLowerCase().endsWith('.hdr');
+      engineRef.current.setEnvironment(url, isHdr).finally(() => URL.revokeObjectURL(url));
+    };
+
+    canvas.addEventListener('dragover', handleDragOver);
+    canvas.addEventListener('drop', handleDrop);
+    return () => {
+      canvas.removeEventListener('dragover', handleDragOver);
+      canvas.removeEventListener('drop', handleDrop);
+    };
+  }, []);
+
   // Lightweight FPS sampler (averages last 20 frames)
   useEffect(() => {
     if (error) return; 

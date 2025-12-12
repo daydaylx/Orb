@@ -44,3 +44,4 @@ Weitere Details finden sich in der [App-README](app/README.md).
 - Post-FX: Bloom, Chromatic Aberration, Film Grain, optional Depth of Field; Qualitätsstufen High/Medium/Low + Optimize.
 - Export: JSON, Share-Link (Query-Param `?orb=`), GLB-Preview Export.
 - Timeline-Scrub + Easing-Auswahl für Animation.
+- Drag & Drop von HDR/PNG/JPG als Environment Map direkt auf die Canvas.
