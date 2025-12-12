@@ -3,6 +3,7 @@ import { LookPanel } from './ui/controls/LookPanel';
 import { MotionPanel } from './ui/controls/MotionPanel';
 import { DetailsPanel } from './ui/controls/DetailsPanel';
 import { PresetPanel } from './ui/controls/PresetPanel';
+import { ExportPanel } from './ui/controls/ExportPanel';
 import { Shell } from './ui/layout/Shell';
 import { HeaderBar } from './ui/layout/HeaderBar';
 import { OrbRenderer } from './core/OrbRenderer';
@@ -10,7 +11,7 @@ import { useOrbStore } from './state/useOrbStore';
 
 function App() {
   const { config } = useOrbStore();
-  const [activeTab, setActiveTab] = useState<'look' | 'motion' | 'details' | 'presets'>('look');
+  const [activeTab, setActiveTab] = useState<'look' | 'motion' | 'details' | 'presets' | 'export'>('look');
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -39,6 +40,12 @@ function App() {
         >
           Presets
         </button>
+        <button
+          onClick={() => setActiveTab('export')}
+          className={`px-3 py-1 rounded text-sm ${activeTab === 'export' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'}`}
+        >
+          Export
+        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -46,6 +53,7 @@ function App() {
         {activeTab === 'motion' && <MotionPanel />}
         {activeTab === 'details' && <DetailsPanel />}
         {activeTab === 'presets' && <PresetPanel />}
+        {activeTab === 'export' && <ExportPanel />}
       </div>
     </div>
   );

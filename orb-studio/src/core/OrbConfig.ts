@@ -141,3 +141,8 @@ export const toExternalConfig = (config: OrbConfigInternal): OrbConfigExternalV1
     // Meta is not in Internal yet, so we leave it undefined or empty
   };
 };
+
+export const exportOrbConfigToJson = (config: OrbConfigInternal): string => {
+  const external = toExternalConfig(config);
+  return JSON.stringify(external, null, 2);
+};
