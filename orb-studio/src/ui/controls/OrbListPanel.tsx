@@ -36,7 +36,7 @@ export const OrbListPanel: React.FC = () => {
                 title="Duplicate"
                 onClick={(e) => { e.stopPropagation(); duplicateOrb(orb.id); }}
               >
-                <span className="text-xs">content_copy</span>
+                <span className="text-xs" aria-label="Duplicate">📋</span>
               </button>
               <button
                 className={`p-1 ${orbs.length > 1 ? 'text-gray-400 hover:text-red-400' : 'text-gray-600 cursor-not-allowed'}`}
