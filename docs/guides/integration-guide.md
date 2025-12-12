@@ -25,7 +25,7 @@ Hier ist ein generisches Beispiel, wie du eine Config in Three.js Uniforms umwan
 ```typescript
 import * as THREE from 'three';
 
-// Typ-Definition (kann aus docs/orb-config-spec.md abgeleitet werden)
+// Typ-Definition (kann aus docs/spec/orb-config-spec.md abgeleitet werden)
 interface OrbConfig {
   rendering: {
     baseRadius: number;

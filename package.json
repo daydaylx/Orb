@@ -1,9 +1,13 @@
 {
   "name": "orb",
   "private": true,
+  "workspaces": [
+    "app"
+  ],
   "scripts": {
-    "dev": "cd app && npm run dev",
-    "build": "cd app && npm run build",
-    "lint": "cd app && npm run lint"
+    "dev": "npm run dev --workspace app",
+    "build": "npm run build --workspace app",
+    "lint": "npm run lint --workspace app",
+    "ci": "npm run lint --workspace app && npm run build --workspace app"
   }
 }

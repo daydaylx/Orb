@@ -7,9 +7,10 @@ Dieses Repository enthält den Quellcode für **Orb Studio**, ein Web-Tool zum E
 ```
 orb/
 ├── app/                    # Orb Studio Anwendung (React + Vite + Three.js)
-├── docs/                   # Dokumentation (Spezifikation, Integration)
+├── docs/                   # Dokumentation: spec/, guides/, changelog/
 ├── examples/               # Beispiel-Konfigurationen (JSON)
-├── .dev/                   # Interne Entwicklungsnotizen (keine Logs mehr im Repo)
+├── .dev/                   # Interne Entwicklungsnotizen (keine Logs im Repo)
+├── .github/workflows/      # CI-Pipeline
 ├── .gitignore
 ├── LICENSE
 ├── README.md
@@ -18,20 +19,21 @@ orb/
 
 ### Hauptverzeichnisse
 
-*   **[`app/`](app/)**: Die Hauptanwendung - Orb Studio (React + Vite + Three.js)
-*   **[`examples/`](examples/)**: Beispiel-Konfigurationen (JSON) für verschiedene Orb-Styles
-*   **[`docs/`](docs/)**: Technische Dokumentation (API-Spezifikation, Integrationsguide)
-*   **[`.dev/`](.dev/)**: Entwicklungsdokumente (Plan, Implementation Log, Notizen). Temporäre Logs/DBs sind aus dem Repository entfernt und via `.gitignore` ausgeschlossen.
+* **[`app/`](app/)**: Die Hauptanwendung - Orb Studio (React + Vite + Three.js)
+* **[`examples/`](examples/)**: Beispiel-Konfigurationen (JSON) für verschiedene Orb-Styles
+* **[`docs/`](docs/)**: Spezifikationen (`spec/`), Guides (`guides/`), Changelog (`changelog/`)
+* **[`.dev/`](.dev/)**: Entwicklungsdokumente (Plan, Implementation Log, Notizen). Temporäre Logs/DBs sind aus dem Repository entfernt und via `.gitignore` ausgeschlossen.
+* **[`.github/workflows/`](.github/workflows/)**: CI-Pipeline (Lint + Build)
 
 ## Schnellstart
 
 Um das Studio lokal zu starten:
 
 ```bash
-# Abhängigkeiten der App installieren
-npm install --prefix app
+# Abhängigkeiten installieren (Workspaces)
+npm install
 
-# Development-Server starten (läuft via Vite)
+# Development-Server starten (Vite)
 npm run dev
 ```
 

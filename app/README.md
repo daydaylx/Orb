@@ -72,7 +72,7 @@ Nach dem Start (`npm run dev`) öffnet sich die Web-Oberfläche.
 
 ## Beispiel-Orbs
 Im Ordner `../examples` (vom Repo-Root aus) finden sich kuratierte JSON-Konfigurationen (z. B. Plasma, Calm Purple, Tech Grid), die zeigen, was mit dem Orb Studio möglich ist. 
-Details zum Format und zur Verwendung in anderen Projekten gibt es in `../docs/orb-config-spec.md`.
+Details zum Format und zur Verwendung in anderen Projekten gibt es in `../docs/spec/orb-config-spec.md`.
 
 ## Tests & Qualitätssicherung
 - **Linting**:
