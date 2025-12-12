@@ -16,7 +16,7 @@ interface OrbState {
 
 export const useOrbStore = create<OrbState>()(
   persist(
-    (set) => {
+    (set, get) => {
       const initialDefault = { ...DEFAULT_ORB_CONFIG, id: uuidv4(), label: 'Default Orb 1' };
       return {
         orbs: [initialDefault], // Ensure there is always at least one orb on first render
@@ -94,7 +94,7 @@ export const useOrbStore = create<OrbState>()(
     },
     {
       name: 'orb-studio-storage', // unique name
-      version: 1, // version of the storage schema
+      version: 2, // version of the storage schema
       // A function to run when rehydrating the storage
       onRehydrateStorage: (_) => {
         console.log('rehydration starts');
@@ -120,17 +120,20 @@ export const useOrbStore = create<OrbState>()(
       },
       // Migrate function for when the version changes (not strictly needed for v1, but good practice)
       migrate: (persistedState: any, version: number) => {
-        if (version === 0) {
-          // If migrating from an older version (e.g., single config stored)
-          // You might need to transform it into the new { orbs: [], activeOrbId: '' } structure
-          // For now, if no orbs are present, it will be handled by onRehydrateStorage
-          console.log('Migrating from version 0 to 1');
-          return {
-              orbs: persistedState.orbs || [],
-              activeOrbId: persistedState.activeOrbId || ''
-          };
+        const state = { ...persistedState };
+        if (!state.orbs) {
+          return persistedState;
         }
-        return persistedState;
+        // ensure newer fields exist
+        state.orbs = state.orbs.map((orb: any) => ({
+          ...orb,
+          post: orb.post || DEFAULT_ORB_CONFIG.post,
+          animation: {
+            loopSeconds: orb.animation?.loopSeconds ?? DEFAULT_ORB_CONFIG.animation.loopSeconds,
+            easing: orb.animation?.easing ?? 'linear',
+          },
+        }));
+        return state;
       },
     },
   ),

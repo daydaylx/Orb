@@ -9,13 +9,20 @@ import { Shell } from './ui/layout/Shell';
 import { HeaderBar } from './ui/layout/HeaderBar';
 import { OrbRenderer } from './core/OrbRenderer';
 import { useOrbStore } from './state/useOrbStore';
+import { usePlaybackStore } from './state/usePlaybackStore';
+import { fromExternalConfig } from './core/OrbConfig';
 
 function App() {
   const activeOrb = useOrbStore((state) => state.orbs.find((orb) => orb.id === state.activeOrbId) || state.orbs[0]);
   const [activeTab, setActiveTab] = useState<'orbs' | 'look' | 'motion' | 'details' | 'presets' | 'export'>('orbs');
-   const [quality, setQuality] = useState<'high' | 'low'>('high');
+   const [quality, setQuality] = useState<'high' | 'medium' | 'low'>('high');
    const [fps, setFps] = useState<number | null>(null);
    const lowFpsTimer = useRef<number | null>(null);
+  const playbackMode = usePlaybackStore((s) => s.mode);
+  const scrubT = usePlaybackStore((s) => s.scrubT);
+  const updateActiveOrb = useOrbStore((state) => state.updateActiveOrb);
+  const createOrb = useOrbStore((state) => state.createOrb);
+  const setActiveOrb = useOrbStore((state) => state.setActiveOrb);
 
   const tabs = [
     { id: 'orbs', label: 'Orbs' },
@@ -29,10 +36,10 @@ function App() {
   // Auto downgrade quality if FPS bleibt längere Zeit niedrig
   useEffect(() => {
     if (fps === null) return;
-    if (fps < 30 && quality === 'high') {
+    if (fps < 30 && quality !== 'low') {
       if (!lowFpsTimer.current) {
         lowFpsTimer.current = window.setTimeout(() => {
-          setQuality('low');
+          setQuality((q) => (q === 'high' ? 'medium' : 'low'));
           lowFpsTimer.current = null;
         }, 1500);
       }
@@ -41,6 +48,23 @@ function App() {
       lowFpsTimer.current = null;
     }
   }, [fps, quality]);
+
+  // Load shared config from URL (?orb=...)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const encoded = params.get('orb');
+    if (encoded) {
+      try {
+        const json = decodeURIComponent(atob(encoded));
+        const external = JSON.parse(json);
+        const internal = fromExternalConfig(external);
+        createOrb(internal);
+        setActiveOrb(internal.id);
+      } catch (e) {
+        console.warn('Failed to import shared orb config', e);
+      }
+    }
+  }, [createOrb, setActiveOrb]);
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -71,9 +95,24 @@ function App() {
     </div>
   );
 
+  const cycleQuality = () => setQuality((q) => (q === 'high' ? 'medium' : q === 'medium' ? 'low' : 'high'));
+
+  const handleOptimize = () => {
+    setQuality('low');
+    updateActiveOrb((prev) => ({
+      bloom: { ...prev.bloom, enabled: false, strength: Math.min(prev.bloom.strength, 1) },
+      post: {
+        ...prev.post,
+        chromaticAberration: false,
+        filmGrain: { ...prev.post.filmGrain, enabled: false },
+        dof: { ...prev.post.dof, enabled: false },
+      },
+    }));
+  };
+
   return (
-    <Shell sidebar={sidebarContent} header={<HeaderBar fps={fps} quality={quality} onToggleQuality={() => setQuality((q) => (q === 'high' ? 'low' : 'high'))} />}>
-      <OrbRenderer config={activeOrb} quality={quality} onFps={setFps} className="w-full h-full" />
+    <Shell sidebar={sidebarContent} header={<HeaderBar fps={fps} quality={quality} onToggleQuality={cycleQuality} onOptimize={handleOptimize} />}>
+      <OrbRenderer config={activeOrb} quality={quality} playbackMode={playbackMode} scrubT={scrubT} onFps={setFps} className="w-full h-full" />
     </Shell>
   );
 }

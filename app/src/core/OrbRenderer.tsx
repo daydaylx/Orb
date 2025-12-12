@@ -5,11 +5,13 @@ import { OrbEngine } from './OrbEngine';
 interface OrbRendererProps {
   config: OrbConfigInternal;
   className?: string;
-  quality: 'high' | 'low';
+  quality: 'high' | 'medium' | 'low';
+  playbackMode: 'live' | 'scrub';
+  scrubT: number;
   onFps?: (fps: number) => void;
 }
 
-export const OrbRenderer: React.FC<OrbRendererProps> = ({ config, className, quality, onFps }) => {
+export const OrbRenderer: React.FC<OrbRendererProps> = ({ config, className, quality, playbackMode, scrubT, onFps }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<OrbEngine | null>(null);
   const fpsSamples = useRef<number[]>([]);
@@ -69,6 +71,12 @@ export const OrbRenderer: React.FC<OrbRendererProps> = ({ config, className, qua
       engineRef.current.setQuality(quality);
     }
   }, [quality]);
+
+  useEffect(() => {
+    if (engineRef.current) {
+      engineRef.current.setPlayback(playbackMode, scrubT);
+    }
+  }, [playbackMode, scrubT]);
 
   // Lightweight FPS sampler (averages last 20 frames)
   useEffect(() => {

@@ -25,7 +25,7 @@ export const Slider: React.FC<SliderProps> = ({ label, value, min, max, step = 0
         step={step}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+        className="w-full h-3 md:h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
       />
       {quickValues && quickValues.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-2">
@@ -33,7 +33,7 @@ export const Slider: React.FC<SliderProps> = ({ label, value, min, max, step = 0
             <button
               key={v}
               type="button"
-              className={`px-2 py-1 text-xs rounded border border-gray-700 ${Math.abs(value - v) < step ? 'bg-gray-700' : 'bg-gray-800 hover:bg-gray-700'}`}
+              className={`px-3 py-1.5 text-xs rounded border border-gray-700 ${Math.abs(value - v) < step ? 'bg-gray-700' : 'bg-gray-800 hover:bg-gray-700'}`}
               onClick={() => onChange(v)}
             >
               {v}

@@ -2,11 +2,12 @@ import React from 'react';
 
 interface HeaderBarProps {
   fps: number | null;
-  quality: 'high' | 'low';
+  quality: 'high' | 'medium' | 'low';
   onToggleQuality: () => void;
+  onOptimize?: () => void;
 }
 
-export const HeaderBar: React.FC<HeaderBarProps> = ({ fps, quality, onToggleQuality }) => {
+export const HeaderBar: React.FC<HeaderBarProps> = ({ fps, quality, onToggleQuality, onOptimize }) => {
   const fpsText = fps ? `${Math.round(fps)} fps` : '– fps';
   const fpsColor = fps && fps < 30 ? 'text-amber-400' : 'text-gray-400';
 
@@ -18,10 +19,19 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ fps, quality, onToggleQual
         <button
           onClick={onToggleQuality}
           className="px-3 py-1 text-xs rounded border border-gray-700 bg-gray-800 hover:bg-gray-700"
-          title="Schaltet zwischen High/Low Qualität (Pixelratio & Post-Effekte)"
+          title="Schaltet High/Medium/Low Qualität (Pixelratio & Post-Effekte)"
         >
-          Quality: {quality === 'high' ? 'High' : 'Low'}
+          Quality: {quality === 'high' ? 'High' : quality === 'medium' ? 'Medium' : 'Low'}
         </button>
+        {onOptimize && (
+          <button
+            onClick={onOptimize}
+            className="px-3 py-1 text-xs rounded border border-amber-500 text-amber-200 hover:bg-amber-500 hover:text-black transition-colors"
+            title="Setzt Qualität auf Low und deaktiviert schwere Effekte für maximale FPS."
+          >
+            Optimize
+          </button>
+        )}
       </div>
     </div>
   );

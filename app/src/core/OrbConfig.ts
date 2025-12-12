@@ -31,6 +31,22 @@ export type OrbConfigInternal = {
     radius: number;
   };
 
+  post: {
+    chromaticAberration: boolean;
+    chromaticAmount: number;
+    vignette: number;
+    filmGrain: {
+      enabled: boolean;
+      intensity: number;
+    };
+    dof: {
+      enabled: boolean;
+      focus: number;
+      aperture: number;
+      maxBlur: number;
+    };
+  };
+
   details: {
     bandCount: number;
     bandSharpness: number;
@@ -46,6 +62,7 @@ export type OrbConfigInternal = {
 
   animation: {
     loopSeconds: number;
+    easing: 'linear' | 'easeInOut' | 'elastic' | 'bounce';
   };
 
   version: 1;
@@ -69,6 +86,10 @@ export type OrbConfigExternalV1 = {
       xSpeed: number;
       ySpeed: number;
     };
+    animation?: {
+      loopSeconds?: number;
+      easing?: 'linear' | 'easeInOut' | 'elastic' | 'bounce';
+    };
     noise?: {
       scale: number;
       intensity: number;
@@ -90,6 +111,21 @@ export type OrbConfigExternalV1 = {
       strength: number;
       radius: number;
       threshold: number;
+    };
+    post?: {
+      chromaticAberration?: boolean;
+      chromaticAmount?: number;
+      vignette?: number;
+      filmGrain?: {
+        enabled: boolean;
+        intensity: number;
+      };
+      dof?: {
+        enabled: boolean;
+        focus: number;
+        aperture: number;
+        maxBlur: number;
+      };
     };
   };
   meta?: {
@@ -127,6 +163,21 @@ export const DEFAULT_ORB_CONFIG: OrbConfigInternal = {
     threshold: 0.1,
     radius: 0.5,
   },
+  post: {
+    chromaticAberration: true,
+    chromaticAmount: 0.0018,
+    vignette: 0.28,
+    filmGrain: {
+      enabled: false,
+      intensity: 0.08,
+    },
+    dof: {
+      enabled: false,
+      focus: 1.0,
+      aperture: 0.00015,
+      maxBlur: 0.007,
+    },
+  },
   details: {
     bandCount: 0,
     bandSharpness: 0.5,
@@ -140,6 +191,7 @@ export const DEFAULT_ORB_CONFIG: OrbConfigInternal = {
   },
   animation: {
     loopSeconds: 10,
+    easing: 'linear',
   },
   version: 1,
 };
@@ -153,10 +205,12 @@ export const toExternalConfig = (config: OrbConfigInternal): OrbConfigExternalV1
       baseRadius: config.baseRadius,
       colors: { ...config.colors },
       rotation: { ...config.rotation },
+      animation: { ...config.animation },
       noise: { ...config.noise },
       glow: { ...config.glow },
       details: { ...config.details },
       bloom: { ...config.bloom },
+      post: { ...config.post },
     },
     // Meta is not in Internal yet, so we leave it undefined or empty
   };
@@ -165,4 +219,58 @@ export const toExternalConfig = (config: OrbConfigInternal): OrbConfigExternalV1
 export const exportOrbConfigToJson = (config: OrbConfigInternal): string => {
   const external = toExternalConfig(config);
   return JSON.stringify(external, null, 2);
+};
+
+// Best-effort conversion from external to internal config
+export const fromExternalConfig = (external: OrbConfigExternalV1): OrbConfigInternal => {
+  const rendering = external.rendering;
+  return {
+    id: external.id,
+    label: external.name,
+    baseRadius: rendering.baseRadius,
+    rotation: rendering.rotation,
+    noise: {
+      scale: rendering.noise?.scale ?? DEFAULT_ORB_CONFIG.noise.scale,
+      intensity: rendering.noise?.intensity ?? DEFAULT_ORB_CONFIG.noise.intensity,
+      speed: rendering.noise?.speed ?? DEFAULT_ORB_CONFIG.noise.speed,
+      detail: rendering.noise?.detail ?? DEFAULT_ORB_CONFIG.noise.detail,
+    },
+    colors: rendering.colors,
+    glow: {
+      intensity: rendering.glow?.intensity ?? DEFAULT_ORB_CONFIG.glow.intensity,
+      threshold: rendering.glow?.threshold ?? DEFAULT_ORB_CONFIG.glow.threshold,
+      radius: rendering.glow?.radius ?? DEFAULT_ORB_CONFIG.glow.radius,
+    },
+    details: {
+      bandCount: rendering.details?.bandCount ?? DEFAULT_ORB_CONFIG.details.bandCount,
+      bandSharpness: rendering.details?.bandSharpness ?? DEFAULT_ORB_CONFIG.details.bandSharpness,
+      particleDensity: rendering.details?.particleDensity ?? DEFAULT_ORB_CONFIG.details.particleDensity,
+    },
+    bloom: {
+      enabled: rendering.bloom?.enabled ?? DEFAULT_ORB_CONFIG.bloom.enabled,
+      strength: rendering.bloom?.strength ?? DEFAULT_ORB_CONFIG.bloom.strength,
+      radius: rendering.bloom?.radius ?? DEFAULT_ORB_CONFIG.bloom.radius,
+      threshold: rendering.bloom?.threshold ?? DEFAULT_ORB_CONFIG.bloom.threshold,
+    },
+    post: {
+      chromaticAberration: rendering.post?.chromaticAberration ?? DEFAULT_ORB_CONFIG.post.chromaticAberration,
+      chromaticAmount: rendering.post?.chromaticAmount ?? DEFAULT_ORB_CONFIG.post.chromaticAmount,
+      vignette: rendering.post?.vignette ?? DEFAULT_ORB_CONFIG.post.vignette,
+      filmGrain: {
+        enabled: rendering.post?.filmGrain?.enabled ?? DEFAULT_ORB_CONFIG.post.filmGrain.enabled,
+        intensity: rendering.post?.filmGrain?.intensity ?? DEFAULT_ORB_CONFIG.post.filmGrain.intensity,
+      },
+      dof: {
+        enabled: rendering.post?.dof?.enabled ?? DEFAULT_ORB_CONFIG.post.dof.enabled,
+        focus: rendering.post?.dof?.focus ?? DEFAULT_ORB_CONFIG.post.dof.focus,
+        aperture: rendering.post?.dof?.aperture ?? DEFAULT_ORB_CONFIG.post.dof.aperture,
+        maxBlur: rendering.post?.dof?.maxBlur ?? DEFAULT_ORB_CONFIG.post.dof.maxBlur,
+      },
+    },
+    animation: {
+      loopSeconds: rendering.animation?.loopSeconds ?? DEFAULT_ORB_CONFIG.animation.loopSeconds,
+      easing: rendering.animation?.easing ?? 'linear',
+    },
+    version: 1,
+  };
 };
