@@ -16,7 +16,7 @@ export const OrbListPanel: React.FC = () => {
         </button>
       </div>
 
-      <div className="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar">
+      <div className="flex flex-col gap-2 max-h-40 overflow-y-auto">
         {orbs.map((orb) => (
           <div
             key={orb.id}
