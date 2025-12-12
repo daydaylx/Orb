@@ -1,0 +1,27 @@
+# Node and build outputs
+node_modules
+dist
+dist-ssr
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# App artefacts (safety; already handled in app/.gitignore)
+app/node_modules
+app/dist
+app/dist-ssr
+
+# Editor / OS
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+
+# Local dev scratch (keep logs/db out of git)
+.dev/logs
+.dev/sqlite_mcp_server.db
+
+# Git backups / temp
+.git_backup_orb
+*.swp
+*.tmp

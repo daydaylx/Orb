@@ -9,7 +9,8 @@ orb/
 ├── app/                    # Orb Studio Anwendung (React + Vite + Three.js)
 ├── docs/                   # Dokumentation (Spezifikation, Integration)
 ├── examples/               # Beispiel-Konfigurationen (JSON)
-├── .dev/                   # Entwicklungsdateien (Logs, Notizen, Implementierungsplan)
+├── .dev/                   # Interne Entwicklungsnotizen (keine Logs mehr im Repo)
+├── .gitignore
 ├── LICENSE
 ├── README.md
 └── package.json
@@ -20,15 +21,17 @@ orb/
 *   **[`app/`](app/)**: Die Hauptanwendung - Orb Studio (React + Vite + Three.js)
 *   **[`examples/`](examples/)**: Beispiel-Konfigurationen (JSON) für verschiedene Orb-Styles
 *   **[`docs/`](docs/)**: Technische Dokumentation (API-Spezifikation, Integrationsguide)
-*   **[`.dev/`](.dev/)**: Entwicklungsdateien (Implementation Log, Plan, Logs)
+*   **[`.dev/`](.dev/)**: Entwicklungsdokumente (Plan, Implementation Log, Notizen). Temporäre Logs/DBs sind aus dem Repository entfernt und via `.gitignore` ausgeschlossen.
 
 ## Schnellstart
 
 Um das Studio lokal zu starten:
 
 ```bash
-# aus dem Repo-Root
-npm install
+# Abhängigkeiten der App installieren
+npm install --prefix app
+
+# Development-Server starten (läuft via Vite)
 npm run dev
 ```
 
