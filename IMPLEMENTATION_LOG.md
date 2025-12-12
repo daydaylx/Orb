@@ -40,8 +40,13 @@ Orb Studio wurde erfolgreich von einem einfachen Prototypen zu einem voll funkti
 *   **Integration**: `docs/integration-guide.md` erklärt Entwicklern, wie sie die Orbs in fremde Projekte einbinden.
 *   **Beispiele**: Im Ordner `examples/` wurden drei repräsentative Orbs (`plasma`, `calm`, `tech`) als Referenz hinterlegt.
 
+### 6. Visuelle Erweiterungen (Phase 10)
+*   **Bloom**: Integration von Post-Processing mittels `EffectComposer` und `UnrealBloomPass`.
+*   **Konfiguration**: Neue Parameter für Bloom (Stärke, Radius, Threshold) in `OrbConfig` und `LookPanel` aufgenommen.
+
 ## Geänderte Dateien (Auswahl)
 *   `src/core/OrbConfig.ts`: Typ-Definitionen und Export-Logik.
+*   `src/core/OrbEngine.ts`: Integration von EffectComposer.
 *   `src/state/useOrbStore.ts`: Zentrale Logik für State und Persistenz.
 *   `src/ui/controls/*.tsx`: Alle UI-Panels angepasst auf Multi-Orb-Logik.
 *   `src/App.tsx`: Hauptlayout und Routing der Tabs.
