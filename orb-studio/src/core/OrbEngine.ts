@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { OrbConfig } from './OrbConfig';
 import { orbVert } from './shader/orb.vert.glsl';
 import { orbFrag } from './shader/orb.frag.glsl';
+import { updateOrbUniforms, type OrbUniforms } from './mapping/configToUniforms';
 
 export class OrbEngine {
   private scene: THREE.Scene;
@@ -10,6 +11,7 @@ export class OrbEngine {
   private orbMesh: THREE.Mesh | null = null;
   private material: THREE.ShaderMaterial | null = null;
   private animationId: number | null = null;
+  private uniforms: OrbUniforms | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.scene = new THREE.Scene();
@@ -20,21 +22,45 @@ export class OrbEngine {
     this.renderer.setSize(canvas.width, canvas.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
+    // We can't initOrb fully here without config, but we can set up the mesh later or use a default config first?
+    // The renderer calls setConfig right after creation.
+    // So let's initialize with default config logic inside setConfig if not initialized,
+    // or just initialize with empty/default uniforms here.
+    // For now, let's create a placeholder initialization.
     this.initOrb();
     this.animate();
   }
 
   private initOrb() {
-    const geometry = new THREE.SphereGeometry(1, 64, 64);
+    const geometry = new THREE.SphereGeometry(1, 128, 128); // Increased segments for better noise detail
 
-    // Placeholder shader material
+    // We need some initial uniforms to avoid crash if render happens before setConfig
+    // But since we use createOrbUniforms, we need a config.
+    // Let's postpone material creation to setConfig or use dummy values.
+    // Using dummy values:
+    const dummyUniforms = {
+      u_time: { value: 0 },
+      u_baseRadius: { value: 0.5 },
+      u_colorInner: { value: new THREE.Color(0xff0000) },
+      u_colorOuter: { value: new THREE.Color(0x0000ff) },
+      u_gradientBias: { value: 0.5 },
+      u_noiseScale: { value: 1.0 },
+      u_noiseIntensity: { value: 0.0 },
+      u_noiseSpeed: { value: 0.0 },
+      u_noiseDetail: { value: 0.0 },
+      u_glowIntensity: { value: 0.0 },
+      u_glowRadius: { value: 0.0 },
+      u_glowThreshold: { value: 0.0 },
+      u_bandCount: { value: 0.0 },
+      u_bandSharpness: { value: 0.0 },
+      u_particleDensity: { value: 0.0 },
+    };
+
+    // Cast to OrbUniforms to make TS happy, though createOrbUniforms would be better if we had config.
+    this.uniforms = dummyUniforms as unknown as OrbUniforms;
+
     this.material = new THREE.ShaderMaterial({
-      uniforms: {
-        u_time: { value: 0 },
-        u_colorInner: { value: new THREE.Color(0xff0000) },
-        u_colorOuter: { value: new THREE.Color(0x0000ff) },
-        u_gradientBias: { value: 0.5 }
-      },
+      uniforms: this.uniforms,
       vertexShader: orbVert,
       fragmentShader: orbFrag
     });
@@ -44,17 +70,38 @@ export class OrbEngine {
   }
 
   public setConfig(config: OrbConfig) {
-    if (!this.material || !this.orbMesh) return;
+    if (!this.material || !this.orbMesh) {
+        // Should not happen if initOrb is called in constructor
+        return;
+    }
 
-    this.orbMesh.scale.setScalar(config.baseRadius * 2); // Base radius logic
+    // If uniforms were just dummy, we might want to replace them properly or just update them.
+    // Since we assigned `this.uniforms` to `this.material.uniforms`, updating `this.uniforms` properties works if they are the same objects.
+    // But updateOrbUniforms updates the .value properties.
 
-    this.material.uniforms.u_colorInner.value.set(config.colors.inner);
-    this.material.uniforms.u_colorOuter.value.set(config.colors.outer);
-    this.material.uniforms.u_gradientBias.value = config.colors.gradientBias;
+    // If we want to use `createOrbUniforms` properly, we should probably do it once or just update values.
+    // Let's use updateOrbUniforms.
 
-    // Background color handling could be on the renderer or a background plane
+    // However, if we didn't use createOrbUniforms in init, we must ensure the structure is correct.
+    // The safest way is to use createOrbUniforms on first real config set if we want to be clean,
+    // but THREE.ShaderMaterial holds references to the uniforms object.
+    // So replacing the entire uniforms object on the material requires creating a new material or manually re-linking which is messy.
+    // So better to just update values.
+
+    if (this.uniforms) {
+        updateOrbUniforms(this.uniforms, config);
+    }
+
+    this.orbMesh.scale.setScalar(config.baseRadius * 2);
     this.renderer.setClearColor(config.colors.background);
+
+    // Rotation logic if we want to do it in JS
+    // For now we just store it? Or maybe we can't easily pass it to animate loop without storing config.
+    // Let's store rotation speed in the class.
+    this.rotationSpeed = config.rotation;
   }
+
+  private rotationSpeed = { xSpeed: 0, ySpeed: 0 };
 
   public resize(width: number, height: number) {
     this.camera.aspect = width / height;
@@ -65,13 +112,13 @@ export class OrbEngine {
   private animate = () => {
     this.animationId = requestAnimationFrame(this.animate);
 
-    if (this.material) {
-        this.material.uniforms.u_time.value = performance.now() / 1000;
+    if (this.uniforms) {
+        this.uniforms.u_time.value = performance.now() / 1000;
     }
 
-    // Basic rotation for now, should come from config
     if (this.orbMesh) {
-       // this.orbMesh.rotation.y += 0.01;
+       this.orbMesh.rotation.y += this.rotationSpeed.ySpeed * 0.05; // Scaling down a bit for sanity
+       this.orbMesh.rotation.x += this.rotationSpeed.xSpeed * 0.05;
     }
 
     this.renderer.render(this.scene, this.camera);
