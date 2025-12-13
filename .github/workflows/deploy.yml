@@ -32,7 +32,6 @@ jobs:
         run: |
           echo "🔍 Verifying Cloudflare configuration..."
           npx wrangler pages project list
-          echo "✅ Token and account verified successfully"
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1

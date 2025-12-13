@@ -81,6 +81,7 @@ npx wrangler pages project list
 # Erwartetes Ergebnis:
 # ✔ Zeigt "orb-studio" in der Liste
 ```
+```
 
 ### CI testen
 
