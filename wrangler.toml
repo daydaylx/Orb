@@ -1,0 +1,6 @@
+name = "orb-studio"
+compatibility_date = "2025-12-13"
+pages_build_output_dir = "app/dist"
+
+[build]
+command = "cd app && npm ci && npm run build"
