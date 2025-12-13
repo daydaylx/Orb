@@ -2,7 +2,7 @@ import React, { Component, type ErrorInfo } from 'react';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
-  fallback?: React.ReactNode;
+  fallback?: React.ReactNode | ((props: { reset: () => void; error: Error | null }) => React.ReactNode);
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
@@ -54,6 +54,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
+        if (typeof this.props.fallback === 'function') {
+            return (this.props.fallback as any)({
+                reset: this.handleReset,
+                error: this.state.error
+            });
+        }
         return this.props.fallback;
       }
 
@@ -63,7 +69,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           <p className="text-gray-300 mb-4 text-center max-w-md">
             The application encountered an unexpected error.
           </p>
-          {this.state.error && (
+          {import.meta.env.DEV && this.state.error && (
             <div className="bg-black/50 p-4 rounded text-sm font-mono text-red-200 mb-4 w-full max-w-2xl overflow-auto max-h-48">
               {this.state.error.toString()}
             </div>
