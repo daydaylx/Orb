@@ -375,11 +375,13 @@ export const importOrbConfig = (jsonString: string): OrbConfigInternal => {
     const parsed = OrbConfigExternalSchema.parse(json);
     // Explicit cast because Zod inference might be slightly different from the Type manually defined
     return fromExternalConfig(parsed as OrbConfigExternalV1);
-  } catch (e: any) {
+  } catch (e) {
     if (e instanceof z.ZodError) {
-      const messages = (e as any).errors.map((err: any) => `${err.path.join('.')}: ${err.message}`).join(', ');
+      const zodError = e as z.ZodError;
+      const messages = zodError.issues.map((err) => `${err.path.join('.')}: ${err.message}`).join(', ');
       throw new Error(`Validation failed: ${messages}`);
     }
-    throw new Error(`Invalid JSON: ${e.message}`);
+    const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+    throw new Error(`Invalid JSON: ${errorMessage}`);
   }
 };

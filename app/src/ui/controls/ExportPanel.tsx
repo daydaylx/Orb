@@ -16,9 +16,7 @@ export const ExportPanel: React.FC = () => {
   const createOrb = useOrbStore((state) => state.createOrb);
   const setActiveOrb = useOrbStore((state) => state.setActiveOrb);
 
-  if (!activeOrb) return null;
-
-  const processFile = (file: File) => {
+  const processFile = useCallback((file: File) => {
     setImportError(null);
     setPreviewConfig(null);
 
@@ -28,20 +26,20 @@ export const ExportPanel: React.FC = () => {
         const json = e.target?.result as string;
         const config = importOrbConfig(json);
         setPreviewConfig(config);
-      } catch (error: any) {
-        console.error('Import failed:', error);
-        setImportError(error.message || 'Failed to import JSON');
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to import JSON';
+        setImportError(errorMessage);
       }
     };
     reader.readAsText(file);
-  };
+  }, []);
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     processFile(file);
     event.target.value = '';
-  };
+  }, [processFile]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -62,7 +60,9 @@ export const ExportPanel: React.FC = () => {
     } else if (file) {
       setImportError('Please drop a valid .json file');
     }
-  }, []);
+  }, [processFile]);
+
+  if (!activeOrb) return null;
 
   const confirmImport = () => {
     if (previewConfig) {

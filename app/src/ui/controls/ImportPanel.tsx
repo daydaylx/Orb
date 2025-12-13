@@ -21,8 +21,9 @@ export const ImportPanel: React.FC = () => {
       });
       setSuccess("Orb imported successfully!");
       setJsonInput('');
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : 'Failed to import configuration';
+      setError(errorMessage);
     }
   };
 
