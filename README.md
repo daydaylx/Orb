@@ -1,4 +1,4 @@
-# Orb Project
+# Orb Projekt
 
 Dieses Repository enthält den Quellcode für **Orb Studio**, ein Web-Tool zum Erstellen und Konfigurieren von 3D-Orbs.
 
