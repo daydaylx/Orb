@@ -43,6 +43,10 @@ Weitere Details finden sich in der [App-README](app/README.md).
 
 Siehe [DEPLOYMENT.md](DEPLOYMENT.md) für vollständige Anleitung zum Deployen auf Cloudflare Pages.
 
+**CI/CD Troubleshooting:**
+- [Quick Setup: Cloudflare API Token](docs/guides/cloudflare-token-quick-setup.md)
+- [Vollständige Troubleshooting-Guide](docs/guides/cloudflare-pages-ci-troubleshooting.md)
+
 ## Neu (Dez 2025)
 - Erweiterte Preset-Bibliothek mit Farbharmonien/Randomizer.
 - Post-FX: Bloom, Chromatic Aberration, Film Grain, optional Depth of Field; Qualitätsstufen High/Medium/Low + Optimize.

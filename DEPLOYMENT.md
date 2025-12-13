@@ -155,6 +155,10 @@ This is an **npm workspace monorepo**:
 3. Create project named `orb-studio`
 4. Or use: `npx wrangler pages project create orb-studio`
 
+### Error: "Authentication error [code: 10000]"
+**Cause:** Invalid API token or missing Cloudflare Pages permissions  
+**Fix:** See comprehensive guide: [Cloudflare Pages CI Troubleshooting](docs/guides/cloudflare-pages-ci-troubleshooting.md)
+
 ---
 
 ## Summary
