@@ -8,7 +8,9 @@
     "dev": "npm run dev --workspace app",
     "build": "npm run build --workspace app",
     "lint": "npm run lint --workspace app",
-    "ci": "npm run lint --workspace app && npm run build --workspace app"
+    "ci": "npm run lint --workspace app && npm run build --workspace app",
+    "deploy": "npx wrangler pages deploy app/dist --project-name orb-studio",
+    "deploy:check": "./scripts/deploy-check.sh"
   },
   "dependencies": {
     "zod": "^4.1.13",

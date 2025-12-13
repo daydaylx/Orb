@@ -103,10 +103,13 @@ npx wrangler --version
 # 1. Build the project (from root directory)
 npm run build
 
-# 2. Verify build output exists
-ls -la app/dist/
+# 2. Check if everything is ready (optional but recommended)
+npm run deploy:check
 
 # 3. Deploy to Cloudflare Pages
+npm run deploy
+
+# OR use the full command:
 npx wrangler pages deploy app/dist --project-name orb-studio
 
 # Optional: Deploy to specific branch
@@ -173,9 +176,10 @@ This is an **npm workspace monorepo**:
 
 ```bash
 # Complete deployment workflow
-npm ci                                                                    # Install
-npm run build                                                             # Build
-npx wrangler pages deploy app/dist --project-name orb-studio             # Deploy
+npm ci                    # Install dependencies
+npm run build             # Build the project
+npm run deploy:check      # Verify setup (optional)
+npm run deploy            # Deploy to Cloudflare Pages
 ```
 
 **That's it. Ready to commit and deploy. ✅**
