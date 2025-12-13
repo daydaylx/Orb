@@ -16,7 +16,7 @@ export function isWebGLAvailable(): boolean {
     }
 
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
