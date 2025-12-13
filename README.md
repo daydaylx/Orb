@@ -39,6 +39,10 @@ npm run dev
 
 Weitere Details finden sich in der [App-README](app/README.md).
 
+## Deployment
+
+Siehe [DEPLOYMENT.md](DEPLOYMENT.md) für vollständige Anleitung zum Deployen auf Cloudflare Pages.
+
 ## Neu (Dez 2025)
 - Erweiterte Preset-Bibliothek mit Farbharmonien/Randomizer.
 - Post-FX: Bloom, Chromatic Aberration, Film Grain, optional Depth of Field; Qualitätsstufen High/Medium/Low + Optimize.
