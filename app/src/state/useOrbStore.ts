@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_ORB_CONFIG } from '../core/OrbConfig';
 import type { OrbConfigInternal } from '../core/OrbConfig';
 import { logger } from '../utils/logger';
+import { canAddMoreOrbs, warnIfQuotaNearlyExceeded } from '../utils/storage';
 
 interface OrbState {
   orbs: OrbConfigInternal[];
@@ -27,12 +28,23 @@ export const useOrbStore = create<OrbState>()(
 
       createOrb: (initial) =>
         set((state) => {
+          // Check if we can add more orbs
+          const check = canAddMoreOrbs(state.orbs.length);
+          if (!check.canAdd) {
+            logger.error(check.reason || 'Cannot add more orbs');
+            return state; // Don't add if limit reached
+          }
+
           const newOrb: OrbConfigInternal = {
             ...DEFAULT_ORB_CONFIG,
             id: uuidv4(),
             label: `New Orb ${state.orbs.length + 1}`,
             ...initial,
           };
+
+          // Check storage quota asynchronously
+          warnIfQuotaNearlyExceeded();
+
           return {
             orbs: [...state.orbs, newOrb],
             activeOrbId: newOrb.id,
@@ -44,11 +56,22 @@ export const useOrbStore = create<OrbState>()(
           const orbToDuplicate = state.orbs.find((orb) => orb.id === id);
           if (!orbToDuplicate) return state;
 
+          // Check if we can add more orbs
+          const check = canAddMoreOrbs(state.orbs.length);
+          if (!check.canAdd) {
+            logger.error(check.reason || 'Cannot duplicate orb');
+            return state; // Don't duplicate if limit reached
+          }
+
           const newOrb: OrbConfigInternal = {
             ...orbToDuplicate,
             id: uuidv4(),
             label: `${orbToDuplicate.label} (Copy)`,
           };
+
+          // Check storage quota asynchronously
+          warnIfQuotaNearlyExceeded();
+
           return {
             orbs: [...state.orbs, newOrb],
             activeOrbId: newOrb.id,
