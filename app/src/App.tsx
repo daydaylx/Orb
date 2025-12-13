@@ -5,7 +5,7 @@ import { DetailsPanel } from './ui/controls/DetailsPanel';
 import { PresetPanel } from './ui/controls/PresetPanel';
 import { ExportPanel } from './ui/controls/ExportPanel';
 import { ImportPanel } from './ui/controls/ImportPanel';
-import { OrbPanel } from './ui/controls/OrbPanel'; // Import OrbPanel
+import { OrbPanel } from './ui/controls/OrbPanel';
 import { Shell } from './ui/layout/Shell';
 import { HeaderBar } from './ui/layout/HeaderBar';
 import { OrbRenderer } from './core/OrbRenderer';
@@ -14,26 +14,40 @@ import { usePlaybackStore } from './state/usePlaybackStore';
 import { fromExternalConfig } from './core/OrbConfig';
 import { ErrorBoundary } from './ui/common/ErrorBoundary';
 
-function RendererErrorFallback() {
+function RendererErrorFallback({ reset, error }: { reset: () => void, error: Error | null }) {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full bg-black text-red-500 p-8">
       <h3 className="text-xl font-bold mb-2">Renderer Crashed</h3>
       <p className="text-gray-400 mb-4">The 3D engine encountered a critical error.</p>
-      <button
-        onClick={() => window.location.reload()}
-        className="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700 text-white transition-colors"
-      >
-        Reload Page
-      </button>
+      {import.meta.env.DEV && error && (
+          <pre className="text-xs text-red-800 mb-4 max-w-full overflow-auto p-2 border border-red-900 bg-red-950/30 rounded">{error.message}</pre>
+      )}
+      <div className="flex gap-4">
+          <button
+            onClick={reset}
+            className="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700 text-white transition-colors"
+          >
+            Restart Renderer
+          </button>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-red-900/50 rounded hover:bg-red-900 text-white transition-colors"
+          >
+            Reload Page
+          </button>
+      </div>
     </div>
   );
 }
 
-function ControlsErrorFallback() {
+function ControlsErrorFallback({ reset }: { reset: () => void }) {
   return (
-    <div className="p-4 bg-red-900/20 border border-red-500/30 rounded text-red-200">
+    <div className="p-4 bg-red-900/20 border border-red-500/30 rounded text-red-200 flex flex-col gap-2">
       <h3 className="font-bold mb-1">Controls Error</h3>
       <p className="text-sm">The settings panel encountered an error.</p>
+      <button onClick={reset} className="text-xs bg-red-800 hover:bg-red-700 px-2 py-1 rounded w-fit text-white transition-colors">
+        Reset Controls
+      </button>
     </div>
   );
 }
@@ -111,7 +125,7 @@ function App() {
         ))}
       </div>
 
-      <ErrorBoundary fallback={<ControlsErrorFallback />}>
+      <ErrorBoundary fallback={(props) => <ControlsErrorFallback {...props} />}>
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
           {activeTab === 'orbs' && <OrbPanel />}
           {activeTab === 'look' && <LookPanel />}
@@ -143,7 +157,7 @@ function App() {
   return (
     <ErrorBoundary>
       <Shell sidebar={sidebarContent} header={<HeaderBar fps={fps} quality={quality} onToggleQuality={cycleQuality} onOptimize={handleOptimize} />}>
-        <ErrorBoundary fallback={<RendererErrorFallback />}>
+        <ErrorBoundary fallback={(props) => <RendererErrorFallback {...props} />}>
           <OrbRenderer config={activeOrb} quality={quality} playbackMode={playbackMode} scrubT={scrubT} onFps={setFps} className="w-full h-full" />
         </ErrorBoundary>
       </Shell>
