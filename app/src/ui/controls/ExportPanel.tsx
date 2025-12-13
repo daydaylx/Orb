@@ -1,39 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
 import { useOrbStore } from '../../state/useOrbStore';
 import { exportOrbConfigToJson, toExternalConfig, importOrbConfig } from '../../core/OrbConfig';
+import type { OrbConfigInternal } from '../../core/OrbConfig';
 
 export const ExportPanel: React.FC = () => {
   const activeOrb = useOrbStore((state) => state.orbs.find((orb) => orb.id === state.activeOrbId));
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
   const [shareFeedback, setShareFeedback] = useState<string | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
+  const [previewConfig, setPreviewConfig] = useState<OrbConfigInternal | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+
   const createOrb = useOrbStore((state) => state.createOrb);
   const setActiveOrb = useOrbStore((state) => state.setActiveOrb);
 
   if (!activeOrb) return null;
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  const processFile = (file: File) => {
     setImportError(null);
+    setPreviewConfig(null);
+
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const json = e.target?.result as string;
         const config = importOrbConfig(json);
-        createOrb(config);
-        setActiveOrb(config.id);
+        setPreviewConfig(config);
       } catch (error: any) {
         console.error('Import failed:', error);
         setImportError(error.message || 'Failed to import JSON');
       }
     };
     reader.readAsText(file);
-    // Reset input
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    processFile(file);
     event.target.value = '';
+  };
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.name.endsWith('.json')) {
+      processFile(file);
+    } else if (file) {
+      setImportError('Please drop a valid .json file');
+    }
+  }, []);
+
+  const confirmImport = () => {
+    if (previewConfig) {
+      createOrb(previewConfig);
+      setActiveOrb(previewConfig.id);
+      setPreviewConfig(null);
+    }
+  };
+
+  const cancelImport = () => {
+    setPreviewConfig(null);
+    setImportError(null);
   };
 
   const handleCopy = async () => {
@@ -154,17 +195,57 @@ export const ExportPanel: React.FC = () => {
       <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
         <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Import</h3>
         <div className="space-y-3">
-            <div className="relative">
+            {!previewConfig ? (
+              <div
+                className={`relative border-2 border-dashed rounded-lg p-6 transition-colors text-center ${
+                  dragOver ? 'border-blue-500 bg-blue-500/10' : 'border-gray-600 hover:border-gray-500'
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
                 <input
                     type="file"
                     accept=".json"
                     onChange={handleFileUpload}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
-                <button className="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded font-medium transition-colors border border-gray-600 border-dashed">
-                    Upload JSON Config
-                </button>
-            </div>
+                <div className="space-y-2 pointer-events-none">
+                  <div className="text-gray-400 text-sm">
+                    {dragOver ? 'Drop file to import' : 'Drag & Drop JSON file here'}
+                  </div>
+                  <div className="text-gray-600 text-xs">or click to browse</div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-gray-900/50 p-3 rounded border border-gray-600 space-y-3">
+                <div className="text-sm font-medium text-gray-300">Preview Import</div>
+                <div className="text-xs text-gray-400 space-y-1">
+                  <div>Name: <span className="text-white">{previewConfig.label}</span></div>
+                  <div>ID: <span className="font-mono text-gray-500">{previewConfig.id.slice(0, 8)}...</span></div>
+                  <div className="flex items-center gap-2">
+                    Colors:
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: previewConfig.colors.inner }} />
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: previewConfig.colors.outer }} />
+                  </div>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={confirmImport}
+                    className="flex-1 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-xs rounded font-medium transition-colors"
+                  >
+                    Confirm Import
+                  </button>
+                  <button
+                    onClick={cancelImport}
+                    className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded font-medium transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
             {importError && (
                 <div className="text-xs text-red-400 bg-red-900/20 p-2 rounded border border-red-900/50">
                     {importError}

@@ -346,7 +346,32 @@ export const fromExternalConfig = (external: OrbConfigExternalV1): OrbConfigInte
 
 export const importOrbConfig = (jsonString: string): OrbConfigInternal => {
   try {
-    const json = JSON.parse(jsonString);
+    let json = JSON.parse(jsonString);
+
+    // Migration V0 -> V1
+    // If it looks like a flat structure (Internal Config) or missing version, try to migrate
+    if (!json.version || json.version === 0 || !json.rendering) {
+      // Assume it's a flat config or V0
+      // Construct a V1-like structure
+      json = {
+        id: json.id || 'imported-' + Date.now(),
+        name: json.name || json.label || 'Imported Orb',
+        version: 1,
+        rendering: {
+          baseRadius: json.baseRadius || json.rendering?.baseRadius || DEFAULT_ORB_CONFIG.baseRadius,
+          colors: json.colors || json.rendering?.colors || DEFAULT_ORB_CONFIG.colors,
+          rotation: json.rotation || json.rendering?.rotation || DEFAULT_ORB_CONFIG.rotation,
+          animation: json.animation || json.rendering?.animation || DEFAULT_ORB_CONFIG.animation,
+          noise: json.noise || json.rendering?.noise || DEFAULT_ORB_CONFIG.noise,
+          glow: json.glow || json.rendering?.glow || DEFAULT_ORB_CONFIG.glow,
+          details: json.details || json.rendering?.details || DEFAULT_ORB_CONFIG.details,
+          bloom: json.bloom || json.rendering?.bloom || DEFAULT_ORB_CONFIG.bloom,
+          post: json.post || json.rendering?.post || DEFAULT_ORB_CONFIG.post,
+        },
+        meta: json.meta,
+      };
+    }
+
     const parsed = OrbConfigExternalSchema.parse(json);
     // Explicit cast because Zod inference might be slightly different from the Type manually defined
     return fromExternalConfig(parsed as OrbConfigExternalV1);
