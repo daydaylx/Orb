@@ -4,7 +4,6 @@ import { ColorPicker } from '../common/ColorPicker';
 import { Slider } from '../common/Slider';
 import { Toggle } from '../common/Toggle';
 import { DEFAULT_ORB_CONFIG } from '../../core/OrbConfig';
-import tinycolor from 'tinycolor2';
 
 export const LookPanel: React.FC = () => {
   const activeOrb = useOrbStore((state) => state.orbs.find((orb) => orb.id === state.activeOrbId));

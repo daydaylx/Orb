@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState, Suspense } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { OrbConfigInternal } from './OrbConfig';
+import { isWebGLAvailable, getWebGLErrorMessage } from '../utils/webgl';
 
 // Lazy load the engine
 const loadEngine = () => import('./OrbEngine').then(m => m.OrbEngine);
@@ -23,6 +24,12 @@ export const OrbRenderer: React.FC<OrbRendererProps> = ({ config, className, qua
 
   useEffect(() => {
     if (!canvasRef.current) return;
+
+    if (!isWebGLAvailable()) {
+      setError(getWebGLErrorMessage());
+      setLoading(false);
+      return;
+    }
 
     // Dispose old engine if it exists
     if (engineRef.current) {

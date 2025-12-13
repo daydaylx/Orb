@@ -18,7 +18,7 @@ interface OrbState {
 export const useOrbStore = create<OrbState>()(
   temporal(
   persist(
-    (set, get) => {
+    (set) => {
       const initialDefault = { ...DEFAULT_ORB_CONFIG, id: uuidv4(), label: 'Default Orb 1' };
       return {
         orbs: [initialDefault], // Ensure there is always at least one orb on first render
@@ -121,7 +121,7 @@ export const useOrbStore = create<OrbState>()(
         };
       },
       // Migrate function for when the version changes (not strictly needed for v1, but good practice)
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: any) => {
         const state = { ...persistedState };
         if (!state.orbs) {
           return persistedState;
