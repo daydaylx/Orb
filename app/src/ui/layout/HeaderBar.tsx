@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useOrbStore } from '../../state/useOrbStore';
+import React from 'react';
+import { useKeyboard } from '../../hooks/useKeyboard';
 
 interface HeaderBarProps {
   fps: number | null;
@@ -11,37 +11,8 @@ interface HeaderBarProps {
 export const HeaderBar: React.FC<HeaderBarProps> = ({ fps, quality, onToggleQuality, onOptimize }) => {
   const fpsText = fps ? `${Math.round(fps)} fps` : '– fps';
 
-  // Use temporal store for undo/redo
-  const { undo, redo, futureStates, pastStates } = useOrbStore.temporal.getState();
-  const canUndo = pastStates.length > 0;
-  const canRedo = futureStates.length > 0;
-
-  // Subscribe to changes in history
-  const [, setHistoryLength] = React.useState(0);
-  useEffect(() => {
-    return useOrbStore.temporal.subscribe((state) => {
-      setHistoryLength(state.pastStates.length + state.futureStates.length);
-    });
-  }, []);
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-        e.preventDefault();
-        if (e.shiftKey) {
-            if (useOrbStore.temporal.getState().futureStates.length > 0) redo();
-        } else {
-            if (useOrbStore.temporal.getState().pastStates.length > 0) undo();
-        }
-      } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
-         e.preventDefault();
-         if (useOrbStore.temporal.getState().futureStates.length > 0) redo();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  // Use custom hook for keyboard shortcuts and undo/redo state
+  const { undo, redo, canUndo, canRedo } = useKeyboard();
   const fpsColor = fps && fps < 30 ? 'text-amber-400' : 'text-gray-400';
 
   return (

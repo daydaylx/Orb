@@ -1,10 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import { LookPanel } from './ui/controls/LookPanel';
-import { MotionPanel } from './ui/controls/MotionPanel';
-import { DetailsPanel } from './ui/controls/DetailsPanel';
-import { PresetPanel } from './ui/controls/PresetPanel';
-import { ExportPanel } from './ui/controls/ExportPanel';
-import { ImportPanel } from './ui/controls/ImportPanel';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { OrbPanel } from './ui/controls/OrbPanel'; // Import OrbPanel
 import { Shell } from './ui/layout/Shell';
 import { HeaderBar } from './ui/layout/HeaderBar';
@@ -13,6 +7,18 @@ import { useOrbStore } from './state/useOrbStore';
 import { usePlaybackStore } from './state/usePlaybackStore';
 import { fromExternalConfig } from './core/OrbConfig';
 import { ErrorBoundary } from './ui/common/ErrorBoundary';
+
+// Lazy load panels
+const LookPanel = lazy(() => import('./ui/controls/LookPanel').then(m => ({ default: m.LookPanel })));
+const MotionPanel = lazy(() => import('./ui/controls/MotionPanel').then(m => ({ default: m.MotionPanel })));
+const DetailsPanel = lazy(() => import('./ui/controls/DetailsPanel').then(m => ({ default: m.DetailsPanel })));
+const PresetPanel = lazy(() => import('./ui/controls/PresetPanel').then(m => ({ default: m.PresetPanel })));
+const ExportPanel = lazy(() => import('./ui/controls/ExportPanel').then(m => ({ default: m.ExportPanel })));
+const ImportPanel = lazy(() => import('./ui/controls/ImportPanel').then(m => ({ default: m.ImportPanel })));
+
+function LoadingSpinner() {
+  return <div className="p-4 text-center text-gray-500 text-xs">Loading...</div>;
+}
 
 function RendererErrorFallback() {
   return (
@@ -60,9 +66,10 @@ function App() {
     { id: 'import', label: 'Import' },
   ] as const;
 
-  // Auto downgrade quality if FPS bleibt längere Zeit niedrig
+  // Auto downgrade quality if FPS remains low for a while
   useEffect(() => {
     if (fps === null) return;
+
     if (fps < 30 && quality !== 'low') {
       if (!lowFpsTimer.current) {
         lowFpsTimer.current = window.setTimeout(() => {
@@ -70,10 +77,21 @@ function App() {
           lowFpsTimer.current = null;
         }, 1500);
       }
-    } else if (lowFpsTimer.current) {
-      window.clearTimeout(lowFpsTimer.current);
-      lowFpsTimer.current = null;
+    } else {
+      // Clear timer if FPS recovers or quality is already low
+      if (lowFpsTimer.current) {
+        window.clearTimeout(lowFpsTimer.current);
+        lowFpsTimer.current = null;
+      }
     }
+
+    // Cleanup on unmount or dependency change
+    return () => {
+      if (lowFpsTimer.current) {
+        window.clearTimeout(lowFpsTimer.current);
+        lowFpsTimer.current = null;
+      }
+    };
   }, [fps, quality]);
 
   // Load shared config from URL (?orb=...)
@@ -113,13 +131,15 @@ function App() {
 
       <ErrorBoundary fallback={<ControlsErrorFallback />}>
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-          {activeTab === 'orbs' && <OrbPanel />}
-          {activeTab === 'look' && <LookPanel />}
-          {activeTab === 'motion' && <MotionPanel />}
-          {activeTab === 'details' && <DetailsPanel />}
-          {activeTab === 'presets' && <PresetPanel />}
-          {activeTab === 'export' && <ExportPanel />}
-          {activeTab === 'import' && <ImportPanel />}
+          <Suspense fallback={<LoadingSpinner />}>
+            {activeTab === 'orbs' && <OrbPanel />}
+            {activeTab === 'look' && <LookPanel />}
+            {activeTab === 'motion' && <MotionPanel />}
+            {activeTab === 'details' && <DetailsPanel />}
+            {activeTab === 'presets' && <PresetPanel />}
+            {activeTab === 'export' && <ExportPanel />}
+            {activeTab === 'import' && <ImportPanel />}
+          </Suspense>
         </div>
       </ErrorBoundary>
     </div>
