@@ -352,7 +352,7 @@ export const importOrbConfig = (jsonString: string): OrbConfigInternal => {
     return fromExternalConfig(parsed as OrbConfigExternalV1);
   } catch (e: any) {
     if (e instanceof z.ZodError) {
-      const messages = e.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
+      const messages = (e as any).errors.map((err: any) => `${err.path.join('.')}: ${err.message}`).join(', ');
       throw new Error(`Validation failed: ${messages}`);
     }
     throw new Error(`Invalid JSON: ${e.message}`);

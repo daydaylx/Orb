@@ -7,7 +7,6 @@ export const ImportPanel: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const createOrb = useOrbStore((state) => state.createOrb);
-  const setActiveOrb = useOrbStore((state) => state.setActiveOrb);
 
   const handleImport = () => {
     setError(null);

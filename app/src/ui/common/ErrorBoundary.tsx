@@ -1,53 +1,79 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, type ErrorInfo } from 'react';
 
-interface Props {
-  children: ReactNode;
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = {
+      hasError: false,
+      error: null,
+    };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+
+    // Log to localStorage for debugging persistence
+    try {
+        const errors = JSON.parse(localStorage.getItem('orb_errors') || '[]');
+        errors.push({
+            message: error.message,
+            stack: error.stack,
+            componentStack: errorInfo.componentStack,
+            timestamp: new Date().toISOString()
+        });
+        // Keep last 50 errors
+        localStorage.setItem('orb_errors', JSON.stringify(errors.slice(-50)));
+    } catch (e) {
+        console.warn('Failed to log error to localStorage', e);
+    }
+
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
+    }
   }
 
-  handleReload = () => {
-    window.location.reload();
+  handleReset = () => {
+    this.setState({ hasError: false, error: null });
   };
 
   render() {
     if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
       return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-950 text-white p-6">
-          <div className="max-w-md w-full bg-gray-900 border border-gray-800 rounded-lg shadow-xl p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4 text-red-500">Something went wrong</h2>
-            <p className="text-gray-400 mb-6">
-              An unexpected error occurred. We apologize for the inconvenience.
-            </p>
-            {this.state.error && (
-              <div className="bg-gray-950 p-4 rounded text-left text-xs font-mono text-red-400 mb-6 overflow-auto max-h-32">
-                {this.state.error.toString()}
-              </div>
-            )}
-            <button
-              onClick={this.handleReload}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded transition-colors"
-            >
-              Reload Application
-            </button>
-          </div>
+        <div className="flex flex-col items-center justify-center p-8 bg-gray-900 text-white rounded-lg border border-red-500/30 m-4">
+          <h2 className="text-xl font-bold text-red-400 mb-2">Something went wrong</h2>
+          <p className="text-gray-300 mb-4 text-center max-w-md">
+            The application encountered an unexpected error.
+          </p>
+          {this.state.error && (
+            <div className="bg-black/50 p-4 rounded text-sm font-mono text-red-200 mb-4 w-full max-w-2xl overflow-auto max-h-48">
+              {this.state.error.toString()}
+            </div>
+          )}
+          <button
+            onClick={this.handleReset}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white font-medium transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       );
     }

@@ -37,7 +37,8 @@ export class OrbEngine {
   private bloomStrengthBase = 1;
 
   constructor(canvas: HTMLCanvasElement) {
-    // WebGL2 capability check
+    // WebGL2 capability check is now done externally before initialization,
+    // but we keep this as a safeguard.
     const context = canvas.getContext('webgl2');
     if (!context) {
       throw new Error('WebGL2 is not available. Please enable hardware acceleration or use a modern browser.');
@@ -79,8 +80,6 @@ export class OrbEngine {
       focus: 1.0,
       aperture: 0.0002,
       maxblur: 0.01,
-      width: canvas.width,
-      height: canvas.height,
     });
     this.dofPass.enabled = false;
     this.composer.addPass(this.dofPass);
@@ -295,15 +294,20 @@ export class OrbEngine {
       }
     });
 
-    // Dispose specific passes if they have a dispose method
-    if (this.bloomPass && typeof (this.bloomPass as any).dispose === 'function') (this.bloomPass as any).dispose();
-    if (this.chromaPass && typeof (this.chromaPass as any).dispose === 'function') (this.chromaPass as any).dispose();
-    if (this.grainPass && typeof (this.grainPass as any).dispose === 'function') (this.grainPass as any).dispose();
-    if (this.dofPass && typeof (this.dofPass as any).dispose === 'function') (this.dofPass as any).dispose();
+    // Dispose all passes in the composer
+    this.composer.passes.forEach((pass) => {
+      if (pass && typeof (pass as any).dispose === 'function') {
+        (pass as any).dispose();
+      }
+    });
 
     this.composer.dispose();
     this.pmrem.dispose();
     this.envMap?.dispose();
+
+    // Clear scene
+    this.scene.clear();
+
     this.renderer.dispose();
     this.renderer.forceContextLoss();
     this.renderer.domElement = null as any;

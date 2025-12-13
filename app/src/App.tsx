@@ -12,6 +12,31 @@ import { OrbRenderer } from './core/OrbRenderer';
 import { useOrbStore } from './state/useOrbStore';
 import { usePlaybackStore } from './state/usePlaybackStore';
 import { fromExternalConfig } from './core/OrbConfig';
+import { ErrorBoundary } from './ui/common/ErrorBoundary';
+
+function RendererErrorFallback() {
+  return (
+    <div className="flex flex-col items-center justify-center w-full h-full bg-black text-red-500 p-8">
+      <h3 className="text-xl font-bold mb-2">Renderer Crashed</h3>
+      <p className="text-gray-400 mb-4">The 3D engine encountered a critical error.</p>
+      <button
+        onClick={() => window.location.reload()}
+        className="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700 text-white transition-colors"
+      >
+        Reload Page
+      </button>
+    </div>
+  );
+}
+
+function ControlsErrorFallback() {
+  return (
+    <div className="p-4 bg-red-900/20 border border-red-500/30 rounded text-red-200">
+      <h3 className="font-bold mb-1">Controls Error</h3>
+      <p className="text-sm">The settings panel encountered an error.</p>
+    </div>
+  );
+}
 
 function App() {
   const activeOrb = useOrbStore((state) => state.orbs.find((orb) => orb.id === state.activeOrbId) || state.orbs[0]);
@@ -86,15 +111,17 @@ function App() {
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-        {activeTab === 'orbs' && <OrbPanel />}
-        {activeTab === 'look' && <LookPanel />}
-        {activeTab === 'motion' && <MotionPanel />}
-        {activeTab === 'details' && <DetailsPanel />}
-        {activeTab === 'presets' && <PresetPanel />}
-        {activeTab === 'export' && <ExportPanel />}
-        {activeTab === 'import' && <ImportPanel />}
-      </div>
+      <ErrorBoundary fallback={<ControlsErrorFallback />}>
+        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+          {activeTab === 'orbs' && <OrbPanel />}
+          {activeTab === 'look' && <LookPanel />}
+          {activeTab === 'motion' && <MotionPanel />}
+          {activeTab === 'details' && <DetailsPanel />}
+          {activeTab === 'presets' && <PresetPanel />}
+          {activeTab === 'export' && <ExportPanel />}
+          {activeTab === 'import' && <ImportPanel />}
+        </div>
+      </ErrorBoundary>
     </div>
   );
 
@@ -114,9 +141,13 @@ function App() {
   };
 
   return (
-    <Shell sidebar={sidebarContent} header={<HeaderBar fps={fps} quality={quality} onToggleQuality={cycleQuality} onOptimize={handleOptimize} />}>
-      <OrbRenderer config={activeOrb} quality={quality} playbackMode={playbackMode} scrubT={scrubT} onFps={setFps} className="w-full h-full" />
-    </Shell>
+    <ErrorBoundary>
+      <Shell sidebar={sidebarContent} header={<HeaderBar fps={fps} quality={quality} onToggleQuality={cycleQuality} onOptimize={handleOptimize} />}>
+        <ErrorBoundary fallback={<RendererErrorFallback />}>
+          <OrbRenderer config={activeOrb} quality={quality} playbackMode={playbackMode} scrubT={scrubT} onFps={setFps} className="w-full h-full" />
+        </ErrorBoundary>
+      </Shell>
+    </ErrorBoundary>
   );
 }
 

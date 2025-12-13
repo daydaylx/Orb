@@ -17,7 +17,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ fps, quality, onToggleQual
   const canRedo = futureStates.length > 0;
 
   // Subscribe to changes in history
-  const [historyLength, setHistoryLength] = React.useState(0);
+  const [, setHistoryLength] = React.useState(0);
   useEffect(() => {
     return useOrbStore.temporal.subscribe((state) => {
       setHistoryLength(state.pastStates.length + state.futureStates.length);

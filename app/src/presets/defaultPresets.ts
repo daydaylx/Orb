@@ -13,7 +13,7 @@ export const defaultPresets: OrbConfig[] = [
     details: { bandCount: 0, bandSharpness: 0.5, particleDensity: 0 },
     bloom: { enabled: true, strength: 1.0, radius: 0.4, threshold: 0.0 },
     post: { ...DEFAULT_ORB_CONFIG.post, chromaticAberration: true },
-    animation: { loopSeconds: 10 },
+    animation: { loopSeconds: 10, easing: 'linear' },
     version: 1,
   },
   {

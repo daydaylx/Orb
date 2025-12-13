@@ -2,14 +2,39 @@ import React, { useState } from 'react';
 import * as THREE from 'three';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
 import { useOrbStore } from '../../state/useOrbStore';
-import { exportOrbConfigToJson, toExternalConfig } from '../../core/OrbConfig';
+import { exportOrbConfigToJson, toExternalConfig, importOrbConfig } from '../../core/OrbConfig';
 
 export const ExportPanel: React.FC = () => {
   const activeOrb = useOrbStore((state) => state.orbs.find((orb) => orb.id === state.activeOrbId));
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
   const [shareFeedback, setShareFeedback] = useState<string | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const createOrb = useOrbStore((state) => state.createOrb);
+  const setActiveOrb = useOrbStore((state) => state.setActiveOrb);
 
   if (!activeOrb) return null;
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setImportError(null);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const json = e.target?.result as string;
+        const config = importOrbConfig(json);
+        createOrb(config);
+        setActiveOrb(config.id);
+      } catch (error: any) {
+        console.error('Import failed:', error);
+        setImportError(error.message || 'Failed to import JSON');
+      }
+    };
+    reader.readAsText(file);
+    // Reset input
+    event.target.value = '';
+  };
 
   const handleCopy = async () => {
     try {
@@ -60,8 +85,9 @@ export const ExportPanel: React.FC = () => {
       metalness: 0.1,
       roughness: 0.4,
       envMapIntensity: 0.2,
-      gradientMap: null,
     });
+    // @ts-expect-error gradientMap is not in the type definition but supported by Three.js
+    mat.gradientMap = null;
     const mesh = new THREE.Mesh(geometry, mat);
     scene.add(mesh);
 
@@ -122,6 +148,28 @@ export const ExportPanel: React.FC = () => {
         </div>
         <div className="mt-4 text-xs text-gray-500">
             Export format: OrbConfigExternalV1
+        </div>
+      </div>
+
+      <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+        <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Import</h3>
+        <div className="space-y-3">
+            <div className="relative">
+                <input
+                    type="file"
+                    accept=".json"
+                    onChange={handleFileUpload}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <button className="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded font-medium transition-colors border border-gray-600 border-dashed">
+                    Upload JSON Config
+                </button>
+            </div>
+            {importError && (
+                <div className="text-xs text-red-400 bg-red-900/20 p-2 rounded border border-red-900/50">
+                    {importError}
+                </div>
+            )}
         </div>
       </div>
     </div>
