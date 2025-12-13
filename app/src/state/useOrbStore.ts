@@ -4,6 +4,7 @@ import { temporal } from 'zundo';
 import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_ORB_CONFIG } from '../core/OrbConfig';
 import type { OrbConfigInternal } from '../core/OrbConfig';
+import { logger } from '../utils/logger';
 
 interface OrbState {
   orbs: OrbConfigInternal[];
@@ -99,11 +100,11 @@ export const useOrbStore = create<OrbState>()(
       version: 2, // version of the storage schema
       // A function to run when rehydrating the storage
       onRehydrateStorage: () => {
-        console.log('rehydration starts');
+        logger.debug('rehydration starts');
         // Optional: Perform any data migration here if versions change.
         return (state, error) => {
           if (error) {
-            console.error('an error happened during rehydration', error);
+            logger.error('an error happened during rehydration', error);
           } else {
             if (!state) return; // Add this check
             // After rehydration, ensure activeOrbId is set, or create a default orb if storage was empty
@@ -116,7 +117,7 @@ export const useOrbStore = create<OrbState>()(
                 // If activeOrbId is missing or points to a non-existent orb, set the first orb as active
                 state.activeOrbId = state.orbs[0].id;
             }
-            console.log('rehydration finished', state);
+            logger.debug('rehydration finished', state);
           }
         };
       },
