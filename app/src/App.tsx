@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { LookPanel } from './ui/controls/LookPanel';
 import { MotionPanel } from './ui/controls/MotionPanel';
 import { DetailsPanel } from './ui/controls/DetailsPanel';
@@ -52,8 +52,19 @@ function ControlsErrorFallback({ reset }: { reset: () => void }) {
   );
 }
 
+const TABS = [
+  { id: 'orbs', label: 'Orbs' },
+  { id: 'look', label: 'Look' },
+  { id: 'motion', label: 'Motion' },
+  { id: 'details', label: 'Details' },
+  { id: 'presets', label: 'Presets' },
+  { id: 'export', label: 'Export' },
+  { id: 'import', label: 'Import' },
+] as const;
+
 function App() {
   const activeOrb = useOrbStore((state) => state.orbs.find((orb) => orb.id === state.activeOrbId) || state.orbs[0]);
+  const orbs = useOrbStore((state) => state.orbs);
   const [activeTab, setActiveTab] = useState<'orbs' | 'look' | 'motion' | 'details' | 'presets' | 'export' | 'import'>('orbs');
    const [quality, setQuality] = useState<'high' | 'medium' | 'low'>('high');
    const [fps, setFps] = useState<number | null>(null);
@@ -63,16 +74,6 @@ function App() {
   const updateActiveOrb = useOrbStore((state) => state.updateActiveOrb);
   const createOrb = useOrbStore((state) => state.createOrb);
   const setActiveOrb = useOrbStore((state) => state.setActiveOrb);
-
-  const tabs = [
-    { id: 'orbs', label: 'Orbs' },
-    { id: 'look', label: 'Look' },
-    { id: 'motion', label: 'Motion' },
-    { id: 'details', label: 'Details' },
-    { id: 'presets', label: 'Presets' },
-    { id: 'export', label: 'Export' },
-    { id: 'import', label: 'Import' },
-  ] as const;
 
   // Auto downgrade quality if FPS bleibt längere Zeit niedrig
   useEffect(() => {
@@ -107,10 +108,10 @@ function App() {
     }
   }, [createOrb, setActiveOrb]);
 
-  const sidebarContent = (
+  const sidebarContent = useMemo(() => (
     <div className="flex flex-col h-full">
       <div className="grid grid-cols-3 gap-2 mb-6 border-b border-gray-800 pb-4">
-        {tabs.map((tab) => (
+        {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -137,7 +138,7 @@ function App() {
         </div>
       </ErrorBoundary>
     </div>
-  );
+  ), [activeTab, activeOrb, orbs]);
 
   const cycleQuality = () => setQuality((q) => (q === 'high' ? 'medium' : q === 'medium' ? 'low' : 'high'));
 
@@ -154,12 +155,17 @@ function App() {
     }));
   };
 
+  // Memoize renderer to prevent re-creation on FPS updates
+  const renderer = useMemo(() => (
+    <ErrorBoundary fallback={(props) => <RendererErrorFallback {...props} />}>
+      <OrbRenderer config={activeOrb} quality={quality} playbackMode={playbackMode} scrubT={scrubT} onFps={setFps} className="w-full h-full" />
+    </ErrorBoundary>
+  ), [activeOrb, quality, playbackMode, scrubT]);
+
   return (
     <ErrorBoundary>
       <Shell sidebar={sidebarContent} header={<HeaderBar fps={fps} quality={quality} onToggleQuality={cycleQuality} onOptimize={handleOptimize} />}>
-        <ErrorBoundary fallback={(props) => <RendererErrorFallback {...props} />}>
-          <OrbRenderer config={activeOrb} quality={quality} playbackMode={playbackMode} scrubT={scrubT} onFps={setFps} className="w-full h-full" />
-        </ErrorBoundary>
+        {renderer}
       </Shell>
     </ErrorBoundary>
   );
