@@ -1,4 +1,5 @@
 {
   "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/schemas/wrangler.jsonc",
+  "name": "orb-studio",
   "pages_build_output_dir": "app/dist"
 }

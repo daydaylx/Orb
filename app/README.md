@@ -87,16 +87,16 @@ Details zum Format und zur Verwendung in anderen Projekten gibt es in `../docs/s
   ```
 
 ## Deployment
-Das Projekt ist eine statische Webanwendung (SPA) und kann auf jedem statischen Hoster deployed werden.
 
-Build-Befehl für das Deployment:
+Siehe [../DEPLOYMENT.md](../DEPLOYMENT.md) für die vollständige Deployment-Anleitung.
+
+**Quick Command:**
 ```bash
 npm run build
+npx wrangler pages deploy app/dist --project-name orb-studio
 ```
-Das Ergebnis liegt im Ordner `dist/`.
 
-Beispiele für Hoster:
-- **Vercel / Netlify / Cloudflare Pages**: Einfach das Repository verbinden und `npm run build` als Build-Command sowie `dist` als Output-Directory angeben.
+Das Projekt nutzt **Cloudflare Pages** für statisches Hosting.
 - **Docker / Nginx**: Den Inhalt von `dist/` auf einen Webserver kopieren.
 
 ## Lizenz
