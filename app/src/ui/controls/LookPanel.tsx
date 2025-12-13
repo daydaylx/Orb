@@ -100,19 +100,19 @@ export const LookPanel: React.FC = () => {
     });
   };
 
-  const updatePost = (key: keyof typeof activeOrb.post, value: any) => {
+  const updatePost = (key: keyof typeof activeOrb.post, value: boolean | number | Record<string, unknown>) => {
     updateActiveOrb((prev) => ({
       post: { ...prev.post, [key]: value },
     }));
   };
 
-  const updateFilmGrain = (key: keyof typeof activeOrb.post.filmGrain, value: any) => {
+  const updateFilmGrain = (key: keyof typeof activeOrb.post.filmGrain, value: number | boolean) => {
     updateActiveOrb((prev) => ({
       post: { ...prev.post, filmGrain: { ...prev.post.filmGrain, [key]: value } },
     }));
   };
 
-  const updateDof = (key: keyof typeof activeOrb.post.dof, value: any) => {
+  const updateDof = (key: keyof typeof activeOrb.post.dof, value: number | boolean) => {
     updateActiveOrb((prev) => ({
       post: { ...prev.post, dof: { ...prev.post.dof, [key]: value } },
     }));

@@ -41,7 +41,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ fps, quality, onToggleQual
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [undo, redo]);
   const fpsColor = fps && fps < 30 ? 'text-amber-400' : 'text-gray-400';
 
   return (

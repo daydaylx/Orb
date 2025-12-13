@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { OrbConfigInternal } from './OrbConfig';
+import type { OrbEngine } from './OrbEngine';
 import { isWebGLAvailable, getWebGLErrorMessage } from '../utils/webgl';
 
 // Lazy load the engine
@@ -16,7 +17,7 @@ interface OrbRendererProps {
 
 export const OrbRenderer: React.FC<OrbRendererProps> = ({ config, className, quality, playbackMode, scrubT, onFps }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const engineRef = useRef<any | null>(null);
+  const engineRef = useRef<OrbEngine | null>(null);
   const fpsSamples = useRef<number[]>([]);
   const fpsRaf = useRef<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -52,9 +53,9 @@ export const OrbRenderer: React.FC<OrbRendererProps> = ({ config, className, qua
              if (canvasRef.current.parentElement) {
                  engineRef.current.resize(canvasRef.current.parentElement.clientWidth, canvasRef.current.parentElement.clientHeight);
              }
-        } catch (e: any) {
-            console.error("Failed to initialize OrbEngine:", e);
-            setError(e.message || "Failed to initialize WebGL context.");
+        } catch (e) {
+            const errorMessage = e instanceof Error ? e.message : "Failed to initialize WebGL context.";
+            setError(errorMessage);
         }
     }).catch(e => {
         console.error("Failed to load OrbEngine code:", e);

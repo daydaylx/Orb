@@ -98,7 +98,7 @@ export const useOrbStore = create<OrbState>()(
       name: 'orb-studio-storage', // unique name
       version: 2, // version of the storage schema
       // A function to run when rehydrating the storage
-      onRehydrateStorage: (_) => {
+      onRehydrateStorage: () => {
         console.log('rehydration starts');
         // Optional: Perform any data migration here if versions change.
         return (state, error) => {
@@ -121,13 +121,13 @@ export const useOrbStore = create<OrbState>()(
         };
       },
       // Migrate function for when the version changes (not strictly needed for v1, but good practice)
-      migrate: (persistedState: any) => {
-        const state = { ...persistedState };
+      migrate: (persistedState: unknown) => {
+        const state = persistedState as { orbs?: Array<Partial<OrbConfigInternal>> };
         if (!state.orbs) {
           return persistedState;
         }
         // ensure newer fields exist
-        state.orbs = state.orbs.map((orb: any) => ({
+        state.orbs = state.orbs.map((orb) => ({
           ...orb,
           post: orb.post || DEFAULT_ORB_CONFIG.post,
           animation: {

@@ -254,11 +254,11 @@ export class OrbEngine {
     try {
       const loader = isHdr ? new RGBELoader() : new TextureLoader();
       const tex = await new Promise<Texture>((resolve, reject) => {
-        (loader as any).load(
+        loader.load(
           url,
           (texture: Texture) => resolve(texture),
           undefined,
-          (err: any) => reject(err)
+          (err: unknown) => reject(err)
         );
       });
       tex.mapping = isHdr ? THREE.EquirectangularReflectionMapping : THREE.EquirectangularReflectionMapping;
@@ -283,7 +283,7 @@ export class OrbEngine {
 
     // Traverse scene and dispose
     this.scene.traverse((object) => {
-      if ((object as any).isMesh) {
+      if ('isMesh' in object && object.isMesh) {
         const mesh = object as THREE.Mesh;
         mesh.geometry.dispose();
         if (Array.isArray(mesh.material)) {
@@ -296,8 +296,8 @@ export class OrbEngine {
 
     // Dispose all passes in the composer
     this.composer.passes.forEach((pass) => {
-      if (pass && typeof (pass as any).dispose === 'function') {
-        (pass as any).dispose();
+      if (pass && 'dispose' in pass && typeof pass.dispose === 'function') {
+        pass.dispose();
       }
     });
 
@@ -310,14 +310,15 @@ export class OrbEngine {
 
     this.renderer.dispose();
     this.renderer.forceContextLoss();
-    this.renderer.domElement = null as any;
+    // domElement cannot be set to null in TypeScript but is cleared internally
+    (this.renderer.domElement as HTMLCanvasElement | null) = null;
   }
 
   private disposeMaterial(material: THREE.Material) {
     material.dispose();
     // Dispose textures if any
     for (const key of Object.keys(material)) {
-      const value = (material as any)[key];
+      const value = (material as unknown as Record<string, unknown>)[key];
       if (value && typeof value === 'object' && 'isTexture' in value) {
         (value as THREE.Texture).dispose();
       }

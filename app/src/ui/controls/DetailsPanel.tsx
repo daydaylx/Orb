@@ -20,7 +20,7 @@ export const DetailsPanel: React.FC = () => {
     }));
   };
 
-  const updateAnimation = (key: keyof typeof activeOrb.animation, value: any) => {
+  const updateAnimation = (key: keyof typeof activeOrb.animation, value: number | string) => {
     updateActiveOrb((prev) => ({
       animation: { ...prev.animation, [key]: value },
     }));
@@ -54,7 +54,7 @@ export const DetailsPanel: React.FC = () => {
             <span>Easing</span>
             <select
               value={activeOrb.animation.easing}
-              onChange={(e) => updateAnimation('easing', e.target.value as any)}
+              onChange={(e) => updateAnimation('easing', e.target.value)}
               className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs"
             >
               <option value="linear">Linear</option>
