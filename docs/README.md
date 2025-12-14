@@ -9,3 +9,5 @@ Struktur:
 Einstieg:
 - Für das Konfigurationsformat: `spec/orb-config-spec.md`.
 - Für die Einbindung in Projekte: `guides/integration-guide.md`.
+- Für Cloudflare Pages Deployment: `guides/cloudflare-token-quick-setup.md`.
+- Für Deployment-Troubleshooting: `guides/cloudflare-pages-ci-troubleshooting.md`.

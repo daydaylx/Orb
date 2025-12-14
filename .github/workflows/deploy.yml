@@ -25,6 +25,14 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify Cloudflare Token & Project
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "🔍 Verifying Cloudflare configuration..."
+          npx wrangler pages project list
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
